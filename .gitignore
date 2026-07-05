@@ -1,0 +1,47 @@
+# ---- Python / Django ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Environment secrets (never commit real credentials)
+.env
+backend/.env
+frontend/.env
+*.env.local
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.claude/
+*.md
+
+# ---- Node / Vite / Frontend ----
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

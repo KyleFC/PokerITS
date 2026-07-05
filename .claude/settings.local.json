@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest -v)",
+      "Bash(python manage.py makemigrations student_model)",
+      "Bash(npm install *)",
+      "PowerShell($env:Path = \"C:\\\\Users\\\\epicb\\\\AppData\\\\Roaming\\\\fnm\\\\node-versions\\\\v22.14.0\\\\installation;\" + $env:Path; cd \"C:\\\\CS Projects\\\\Poker ITS\\\\frontend\"; Write-Output \"vite:\"; node -e \"console.log\\(require\\('./node_modules/vite/package.json'\\).version\\)\"; Write-Output \"plugin-react:\"; node -e \"console.log\\(require\\('./node_modules/@vitejs/plugin-react/package.json'\\).version\\)\")",
+      "Bash(python manage.py makemigrations --check --dry-run)",
+      "Bash(python -m pytest -q)",
+      "WebSearch",
+      "WebFetch(domain:pokerkit.readthedocs.io)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}
