@@ -9,7 +9,16 @@
       "Bash(python -m pytest -q)",
       "WebSearch",
       "WebFetch(domain:pokerkit.readthedocs.io)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "PowerShell(python --version)",
+      "PowerShell(python -m pip install \"pokerkit>=0.7,<0.9\" 2>&1)",
+      "PowerShell(python \"C:\\\\Users\\\\epicb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--CS-Projects-Poker-ITS\\\\7990a02d-c5ea-442c-b901-abd499cdd7f9\\\\scratchpad\\\\probe.py\")",
+      "PowerShell(python \"C:\\\\Users\\\\epicb\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--CS-Projects-Poker-ITS\\\\7990a02d-c5ea-442c-b901-abd499cdd7f9\\\\scratchpad\\\\verify_scenarios.py\")",
+      "PowerShell(python -m pytest apps/poker_engine/tests/test_replay.py -q 2>&1)",
+      "PowerShell($c = Get-Command node -ErrorAction SilentlyContinue; if \\($c\\) { $c.Source } else { \"node not found on PATH\" }; Get-ChildItem \"$env:ProgramFiles\\\\nodejs\\\\npm.cmd\",\"$env:APPDATA\\\\npm\\\\npm.cmd\",\"$env:LOCALAPPDATA\\\\nvm\" -ErrorAction SilentlyContinue | Select-Object -First 5 FullName)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "mcp__claude-in-chrome__tabs_context_mcp"
     ]
   }
 }

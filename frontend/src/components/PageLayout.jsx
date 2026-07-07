@@ -21,6 +21,8 @@ const PageLayout = ({ children, onLogout, user }) => {
 
           <nav className="flex items-center gap-6">
             <Link to="/" className="text-sm font-medium text-slate-300 hover:text-white transition">Dashboard</Link>
+            <Link to="/practice" className="text-sm font-medium text-slate-300 hover:text-white transition">Infinite Practice</Link>
+            <Link to="/tutorial" className="text-sm font-medium text-slate-300 hover:text-white transition">Tutorial</Link>
             {user && (
               <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
                 <div className="flex items-center gap-2">
@@ -46,11 +48,6 @@ const PageLayout = ({ children, onLogout, user }) => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 mt-12 text-center text-xs text-slate-500">
-        <p>© 2026 Poker ITS — Built with React & Django REST Framework</p>
-      </footer>
     </div>
   );
 };

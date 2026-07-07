@@ -3,6 +3,7 @@ from django.conf import settings
 
 SOURCE_CHOICES = [
     ('quiz', 'Quiz'),
+    ('infinite', 'Generated Quiz'),
     ('hand', 'Live Hand'),
 ]
 

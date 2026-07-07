@@ -5,6 +5,8 @@ import api, { authService } from './services/api';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Tutorial from './pages/Tutorial';
+import InfinitePractice from './pages/InfinitePractice';
 
 export default function App() {
   const [auth, setAuth] = useState(authService.isAuthenticated());
@@ -56,6 +58,14 @@ export default function App() {
         <Route
           path="/"
           element={auth ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/tutorial"
+          element={auth ? <Tutorial user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/practice"
+          element={auth ? <InfinitePractice user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

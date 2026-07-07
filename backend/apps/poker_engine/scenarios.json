@@ -14,7 +14,22 @@
     "options": ["Fold", "Call", "Raise to 2.5BB"],
     "correct_answer": "Fold",
     "explanation": "72o is the weakest starting hand in Texas Hold'em. It is never part of any standard opening range from any position, especially not UTG where you need the tightest range. Folding is the only correct play.",
-    "ev_notes": "Opening 72o from UTG has a strongly negative expected value against any reasonable defending range."
+    "ev_notes": "Opening 72o from UTG has a strongly negative expected value against any reasonable defending range.",
+    "question_type": "action",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["SB", "BB", "UTG", "HJ", "CO", "BTN"],
+      "hero": "UTG",
+      "stacks": {"SB": 100, "BB": 100, "UTG": 100, "HJ": 100, "CO": 100, "BTN": 100},
+      "hole_cards": {"UTG": "7s2d"},
+      "script": [],
+      "action_options": {
+        "Fold": {"op": "fold"},
+        "Call": {"op": "check_call"},
+        "Raise to 2.5BB": {"op": "raise_to", "amount": 2.5}
+      }
+    }
   },
   {
     "id": "preflop_02",
@@ -31,7 +46,26 @@
     "options": ["Fold", "Call 2.5BB", "3-Bet to 8BB"],
     "correct_answer": "3-Bet to 8BB",
     "explanation": "AKs is a premium pocket holding that wants to play a bloated pot, ideally with initiative and in position. While calling is acceptable in some contexts, 3-betting for value is standard and highly profitable from the Button.",
-    "ev_notes": "3-betting AKs maximizes equity realization and builds the pot while forcing out weaker hands."
+    "ev_notes": "3-betting AKs maximizes equity realization and builds the pot while forcing out weaker hands.",
+    "question_type": "action",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["SB", "BB", "UTG", "HJ", "CO", "BTN"],
+      "hero": "BTN",
+      "stacks": {"SB": 100, "BB": 100, "UTG": 100, "HJ": 100, "CO": 100, "BTN": 100},
+      "hole_cards": {"BTN": "AcKc"},
+      "script": [
+        {"op": "fold", "actor": "UTG"},
+        {"op": "raise_to", "actor": "HJ", "amount": 2.5},
+        {"op": "fold", "actor": "CO"}
+      ],
+      "action_options": {
+        "Fold": {"op": "fold"},
+        "Call 2.5BB": {"op": "check_call"},
+        "3-Bet to 8BB": {"op": "raise_to", "amount": 8}
+      }
+    }
   },
   {
     "id": "equity_01",
@@ -48,7 +82,22 @@
     "options": ["Approx. 15%", "Approx. 30%", "Approx. 45%", "Approx. 75%"],
     "correct_answer": "Approx. 45%",
     "explanation": "You have 9 outs to hit a flush and 6 outs to hit top pair with your overcards (A or K). With 15 clean outs, your probability of hitting by the river is approximately 45% (using the rule of 4: 15 * 4 = 60%, but adjusted slightly down for overlapping cards and actual card math which yields ~45-50% equity against a standard top-pair range).",
-    "ev_notes": "A monster draw has enough raw equity to play aggressively on the flop."
+    "ev_notes": "A monster draw has enough raw equity to play aggressively on the flop.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["BB", "BTN"],
+      "hero": "BTN",
+      "stacks": {"BB": 90, "BTN": 90},
+      "hole_cards": {"BTN": "AcKc"},
+      "script": [
+        {"op": "raise_to", "actor": "BTN", "amount": 3.5},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "Tc8c2d"},
+        {"op": "raise_to", "actor": "BB", "amount": 8}
+      ]
+    }
   },
   {
     "id": "equity_02",
@@ -57,7 +106,7 @@
     "description": "You hold J♥ T♥ on a board of Q♠ 9♣ 3♦. You have an open-ended straight draw (8 outs). What is your probability of completing your straight on the very next card (the Turn)?",
     "hole_cards": ["Jh", "Th"],
     "board": ["Qs", "9c", "3d"],
-    "position": "CO",
+    "position": "BTN",
     "pot_size_bb": 8.0,
     "stack_size_bb": 95,
     "villain_action": "Villain checks",
@@ -65,41 +114,104 @@
     "options": ["8%", "17%", "34%", "50%"],
     "correct_answer": "17%",
     "explanation": "With 8 outs (any K or 8) and 47 unseen cards remaining in the deck, your probability of hitting the straight on the next card is 8/47 ≈ 17.02% (roughly 17%).",
-    "ev_notes": "Understanding single-street equity is vital for determining whether to call a bet or check-back."
+    "ev_notes": "Understanding single-street equity is vital for determining whether to call a bet or check-back.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["BB", "BTN"],
+      "hero": "BTN",
+      "stacks": {"BB": 95, "BTN": 95},
+      "hole_cards": {"BTN": "JhTh"},
+      "script": [
+        {"op": "raise_to", "actor": "BTN", "amount": 4},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "Qs9c3d"},
+        {"op": "check_call", "actor": "BB"}
+      ]
+    }
   },
   {
     "id": "pot_odds_01",
     "skill": "pot_odds",
     "title": "Facing a Half-Pot River Bet",
-    "description": "On the river, the pot is $100. Your opponent bets $50. You hold a marginal bluff catcher. What minimum equity (win probability) do you need to make calling a break-even decision?",
+    "description": "On the river, the pot is 10 BB. Your opponent bets 5 BB (a half-pot bet). You hold a marginal bluff catcher (A♠ 2♠). What minimum equity (win probability) do you need to make calling a break-even decision?",
     "hole_cards": ["As", "2s"],
     "board": ["Kd", "Qh", "8s", "5d", "3c"],
     "position": "BB",
-    "pot_size_bb": 150.0,
-    "stack_size_bb": 80,
-    "villain_action": "Villain bets $50",
+    "pot_size_bb": 15.0,
+    "stack_size_bb": 100,
+    "villain_action": "Villain bets 5BB",
     "question": "What is the required break-even equity?",
     "options": ["17%", "25%", "33%", "50%"],
     "correct_answer": "25%",
-    "explanation": "You must call $50 to win a total pot of $200 ($100 pre-bet + $50 opponent bet + $50 your call). Required equity = Call / (Pot + Call) = $50 / $200 = 25%. If your hand is good more than 25% of the time, calling has positive expected value.",
-    "ev_notes": "Required equity = risk / (risk + reward) = 50 / (150 + 50) = 25%."
+    "explanation": "You must call 5 BB to win a total pot of 20 BB (10 BB pre-bet + 5 BB opponent bet + 5 BB your call). Required equity = Call / (Pot + Call) = 5 / 20 = 25%. If your hand is good more than 25% of the time, calling has positive expected value.",
+    "ev_notes": "Required equity = risk / (risk + reward) = 5 / (15 + 5) = 25%.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["BB", "BTN"],
+      "hero": "BB",
+      "stacks": {"BB": 100, "BTN": 100},
+      "hole_cards": {"BB": "As2s"},
+      "script": [
+        {"op": "raise_to", "actor": "BTN", "amount": 2},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "KdQh8s"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 1},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "5d"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 2},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "3c"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 5}
+      ]
+    }
   },
   {
     "id": "pot_odds_02",
     "skill": "pot_odds",
     "title": "Facing a Large Overbet",
-    "description": "On the river, the pot is $100. Your opponent bets $200. You hold a marginal bluff catcher. What minimum equity do you need to break even on a call?",
+    "description": "On the river, the pot is 10 BB. Your opponent bets 20 BB (a 2x-pot overbet). You hold a marginal bluff catcher (Q♣ J♦). What minimum equity do you need to break even on a call?",
     "hole_cards": ["Qc", "Jd"],
     "board": ["Ad", "Tc", "7s", "6h", "2c"],
     "position": "BB",
-    "pot_size_bb": 300.0,
-    "stack_size_bb": 75,
-    "villain_action": "Villain bets $200",
+    "pot_size_bb": 30.0,
+    "stack_size_bb": 100,
+    "villain_action": "Villain bets 20BB",
     "question": "What is the required break-even equity?",
     "options": ["20%", "33%", "40%", "66%"],
     "correct_answer": "40%",
-    "explanation": "You must risk $200 to win a total pot of $500 ($100 pre-bet + $200 opponent bet + $200 your call). Required equity = $200 / $500 = 40%. Because of the large bet size, your hand needs to be correct much more often (40% vs 25% for half-pot).",
-    "ev_notes": "Overbets decrease the caller's pot odds, requiring a tighter, stronger defending range."
+    "explanation": "You must risk 20 BB to win a total pot of 50 BB (10 BB pre-bet + 20 BB opponent bet + 20 BB your call). Required equity = 20 / 50 = 40%. Because of the large bet size, your hand needs to be correct much more often (40% vs 25% for a half-pot bet).",
+    "ev_notes": "Overbets decrease the caller's pot odds, requiring a tighter, stronger defending range.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["BB", "BTN"],
+      "hero": "BB",
+      "stacks": {"BB": 100, "BTN": 100},
+      "hole_cards": {"BB": "QcJd"},
+      "script": [
+        {"op": "raise_to", "actor": "BTN", "amount": 2},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "AdTc7s"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 1},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "6h"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 2},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "2c"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "raise_to", "actor": "BTN", "amount": 20}
+      ]
+    }
   },
   {
     "id": "implied_odds_01",
@@ -120,23 +232,59 @@
     ],
     "correct_answer": "Yes, call because the effective stacks are deep enough to pay off if you hit.",
     "explanation": "You need to pay 2.5BB more to play. You will flop a set about 11.8% of the time (approx. 7.5:1 against). While direct pot odds do not justify a call (you need to call 2.5BB to win 4.5BB), the implied odds do: stacks are 100BB deep (a ratio of 40:1 relative to the call size), meaning if you hit your set, you can win enough from UTG's strong range to cover all the times you fold the flop.",
-    "ev_notes": "Set-mining rule of thumb: effective stack size should be at least 10x-15x the bet size you need to call."
+    "ev_notes": "Set-mining rule of thumb: effective stack size should be at least 10x-15x the bet size you need to call.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["SB", "BB", "UTG", "HJ", "CO", "BTN"],
+      "hero": "SB",
+      "stacks": {"SB": 100, "BB": 100, "UTG": 100, "HJ": 100, "CO": 100, "BTN": 100},
+      "hole_cards": {"SB": "2s2d"},
+      "script": [
+        {"op": "raise_to", "actor": "UTG", "amount": 3},
+        {"op": "fold", "actor": "HJ"},
+        {"op": "fold", "actor": "CO"},
+        {"op": "fold", "actor": "BTN"}
+      ]
+    }
   },
   {
     "id": "mdf_01",
     "skill": "mdf",
     "title": "River Defense Frequency",
-    "description": "On the river, the pot is $100. Your opponent bets $75. What is the Minimum Defense Frequency (MDF) of your range to prevent your opponent from profitably bluffing you with any two cards?",
+    "description": "On the river, the pot is 10 BB. Your opponent bets 7.5 BB. What is the Minimum Defense Frequency (MDF) of your range to prevent your opponent from profitably bluffing you with any two cards?",
     "hole_cards": ["As", "Th"],
     "board": ["Ks", "Qd", "7c", "3h", "2d"],
-    "position": "IP",
-    "pot_size_bb": 175.0,
+    "position": "BTN",
+    "pot_size_bb": 17.5,
     "stack_size_bb": 100,
-    "villain_action": "Villain bets $75",
+    "villain_action": "Villain bets 7.5BB",
     "question": "What is the Minimum Defense Frequency (MDF)?",
     "options": ["25%", "43%", "57%", "70%"],
     "correct_answer": "57%",
-    "explanation": "MDF is calculated as 1 / (1 + alpha), where alpha is the bet size relative to the pot (bet / pot = 75/100 = 0.75). MDF = 1 / (1 + 0.75) = 1 / 1.75 ≈ 57.14% (57%). You must defend (call or raise) with at least 57% of your range to prevent opponent's bluffs from showing an automatic profit.",
-    "ev_notes": "If you defend less than 57%, the opponent can make a profit by bluffing 100% of their air hands."
+    "explanation": "MDF is calculated as 1 / (1 + alpha), where alpha is the bet size relative to the pot (bet / pot = 7.5 / 10 = 0.75). MDF = 1 / (1 + 0.75) = 1 / 1.75 ≈ 57.14% (57%). You must defend (call or raise) with at least 57% of your range to prevent opponent's bluffs from showing an automatic profit.",
+    "ev_notes": "If you defend less than 57%, the opponent can make a profit by bluffing 100% of their air hands.",
+    "question_type": "concept",
+    "gameplay": {
+      "small_blind": 0.5,
+      "big_blind": 1.0,
+      "seats": ["BB", "BTN"],
+      "hero": "BTN",
+      "stacks": {"BB": 100, "BTN": 100},
+      "hole_cards": {"BTN": "AsTh"},
+      "script": [
+        {"op": "raise_to", "actor": "BTN", "amount": 3},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "board", "cards": "KsQd7c"},
+        {"op": "raise_to", "actor": "BB", "amount": 2},
+        {"op": "check_call", "actor": "BTN"},
+        {"op": "board", "cards": "3h"},
+        {"op": "check_call", "actor": "BB"},
+        {"op": "check_call", "actor": "BTN"},
+        {"op": "board", "cards": "2d"},
+        {"op": "raise_to", "actor": "BB", "amount": 7.5}
+      ]
+    }
   }
 ]

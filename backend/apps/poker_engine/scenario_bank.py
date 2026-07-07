@@ -13,6 +13,8 @@ never trusted (see ``student_model.views.QuizResultView``).
 import json
 from pathlib import Path
 
+from apps.poker_engine import generators
+
 SCENARIOS_FILE = Path(__file__).resolve().parent / 'scenarios.json'
 
 
@@ -28,5 +30,15 @@ def load_scenarios() -> list[dict]:
 
 
 def get_scenario_by_id(scenario_id: str) -> dict | None:
-    """Return the full scenario dict (including answer key) for an id, or None."""
+    """Return the full scenario dict (including answer key) for an id, or None.
+
+    Handles both the static bank and procedurally generated scenarios: a
+    ``gen:...`` id is rebuilt deterministically from the seed it encodes (see
+    ``generators``) rather than looked up on disk. Routing generated ids through
+    the same resolver means every existing caller — the detail/replay views and
+    the server-side quiz grader — resolves and grades generated scenarios with
+    no extra code path.
+    """
+    if generators.is_generated_id(scenario_id):
+        return generators.generate_from_id(scenario_id)
     return next((s for s in load_scenarios() if s.get('id') == scenario_id), None)

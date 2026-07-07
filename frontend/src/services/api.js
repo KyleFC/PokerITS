@@ -123,6 +123,26 @@ export const pokerService = {
     const response = await api.get(`/poker/scenarios/${id}/`);
     return response.data;
   },
+
+  // Fetch a freshly procedurally-generated scenario for infinite practice mode.
+  // Pass a skill to drill it specifically; omit it to let the server pick,
+  // biased toward the student's weakest BKT skills. The answer key is stripped
+  // server-side, exactly like the static bank — grading still happens via
+  // submitQuizResult against the seed encoded in the returned scenario id.
+  generateScenario: async (skill = '') => {
+    const url = skill ? `/poker/scenarios/generate/?skill=${skill}` : '/poker/scenarios/generate/';
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // Returns the scripted hand-replay frames that lead up to a scenario's
+  // decision point: { frames, hero, seats, question_type, scenario }.
+  // 404s for scenarios that have no gameplay script (callers should fall back
+  // to the static quiz view).
+  getScenarioReplay: async (id) => {
+    const response = await api.get(`/poker/scenarios/${id}/replay/`);
+    return response.data;
+  },
 };
 
 export default api;
