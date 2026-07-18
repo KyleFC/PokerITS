@@ -6,6 +6,7 @@ from apps.student_model.models import StudentProfile, DEFAULT_SKILLS
 from apps.student_model.observations import SkillObservation
 from apps.student_model.serializers import StudentProfileSerializer, QuizResultSerializer, SkillObservationSerializer
 from apps.student_model.bkt_engine import update_mastery, DEFAULT_PARAMS
+from apps.student_model.services import record_skill_observation
 from apps.poker_engine.scenario_bank import get_scenario_by_id
 from apps.poker_engine import generators
 
@@ -54,25 +55,17 @@ class QuizResultView(APIView):
         correct = answer == scenario.get('correct_answer')
 
         with transaction.atomic():
-            profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-
-            prior = profile.skills.get(skill, DEFAULT_SKILLS[skill])
-            posterior = round(update_mastery(prior, correct, params), 4)
-
-            profile.skills[skill] = posterior
-            profile.save()
-
-            SkillObservation.objects.create(
+            obs = record_skill_observation(
                 user=request.user,
                 skill=skill,
                 correct=correct,
-                posterior_after=posterior,
                 # Distinguish authored diagnostics from infinite-mode drills so
                 # analytics can tell the two apart; the id still fully identifies
                 # (and can regenerate) the exact question either way.
                 source='infinite' if generators.is_generated_id(scenario_id) else 'quiz',
                 reference_id=scenario_id,
             )
+            profile = obs['profile']
 
         return Response(
             {

@@ -1,5 +1,8 @@
 import pytest
-from apps.poker_engine.hand_eval import evaluate_hand, compare_hands, make_card, make_cards, make_deck
+from apps.poker_engine.hand_eval import (
+    evaluate_hand, compare_hands, make_card, make_cards, make_deck,
+    estimate_equity_monte_carlo,
+)
 
 class TestMakeCard:
     def test_ace_of_spades(self):
@@ -77,3 +80,44 @@ class TestCompareHands:
         # Both have royal flush on board
         result = compare_hands(['2h', '3h'], ['4h', '5h'], board)
         assert result == 0  # tie
+
+
+class TestEquityMonteCarlo:
+    def test_seed_makes_it_reproducible(self):
+        a = estimate_equity_monte_carlo(['As', 'Ks'], num_simulations=500, seed=1)
+        b = estimate_equity_monte_carlo(['As', 'Ks'], num_simulations=500, seed=1)
+        assert a == b
+
+    def test_equity_is_a_probability(self):
+        eq = estimate_equity_monte_carlo(['7h', '2d'], num_simulations=500, seed=3)
+        assert 0.0 <= eq <= 1.0
+
+    def test_dominant_hand_wins_almost_always_on_locked_board(self):
+        # Hero has the nut flush already made; villain drawing near-dead.
+        eq = estimate_equity_monte_carlo(
+            ['As', 'Ks'], board=['Qs', 'Js', '2s', '7d'],
+            num_simulations=800, seed=5,
+        )
+        assert eq > 0.95
+
+    def test_aces_crush_a_random_hand_preflop(self):
+        # AA is ~85% preflop heads-up vs a random hand.
+        eq = estimate_equity_monte_carlo(['As', 'Ad'], num_simulations=3000, seed=7)
+        assert 0.80 < eq < 0.90
+
+    def test_more_opponents_lowers_equity(self):
+        one = estimate_equity_monte_carlo(['As', 'Ad'], num_opponents=1, num_simulations=2000, seed=9)
+        four = estimate_equity_monte_carlo(['As', 'Ad'], num_opponents=4, num_simulations=2000, seed=9)
+        assert four < one
+
+    def test_dead_heat_on_board_is_a_split(self):
+        # Royal flush on the board: hero and one opponent must split (equity 0.5).
+        eq = estimate_equity_monte_carlo(
+            ['2h', '3d'], board=['Ac', 'Kc', 'Qc', 'Jc', 'Tc'],
+            num_simulations=200, seed=11,
+        )
+        assert eq == pytest.approx(0.5)
+
+    def test_rejects_duplicate_cards(self):
+        with pytest.raises(ValueError):
+            estimate_equity_monte_carlo(['As', 'As'], num_simulations=10, seed=1)

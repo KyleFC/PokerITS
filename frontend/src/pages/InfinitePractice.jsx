@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Infinity as InfinityIcon, RefreshCw, XCircle, ArrowRight, Target, Zap } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Infinity as InfinityIcon, RefreshCw, XCircle, ArrowRight, Target, Zap, BookOpen } from 'lucide-react';
 import { pokerService, studentService } from '../services/api';
-import { SKILL_LABELS, GENERATABLE_SKILLS, MASTERY_THRESHOLD } from '../constants';
+import { SKILL_LABELS, GENERATABLE_SKILLS, isMastered } from '../constants';
+import { LESSON_BY_SKILL } from '../lessons/meta';
 import PageLayout from '../components/PageLayout';
 import PokerCard from '../components/PokerCard';
 import QuizResultPanel from '../components/QuizResultPanel';
@@ -19,7 +22,13 @@ const emptyStats = { answered: 0, correct: 0, streak: 0, bestStreak: 0 };
 // server-side, and the grading response carries the updated BKT profile — so
 // mastery bars move in real time without a separate profile fetch.
 const InfinitePractice = ({ user, onLogout }) => {
-  const [skillFilter, setSkillFilter] = useState('');
+  // Deep links like /practice?skill=pot_odds (used by the analytics page's
+  // "needs review" chips) pre-select that skill's drill tab.
+  const [searchParams] = useSearchParams();
+  const requestedSkill = searchParams.get('skill');
+  const [skillFilter, setSkillFilter] = useState(
+    GENERATABLE_SKILLS.includes(requestedSkill) ? requestedSkill : ''
+  );
   const [scenario, setScenario] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -103,14 +112,13 @@ const InfinitePractice = ({ user, onLogout }) => {
   return (
     <PageLayout onLogout={onLogout} user={user}>
       {/* Header */}
-      <section className="bg-gradient-to-r from-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="bg-gradient-to-tr from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/20">
-            <InfinityIcon className="h-7 w-7 text-white" />
+          <div className="bg-slate-800 border border-slate-700 p-3 rounded-lg">
+            <InfinityIcon className="h-7 w-7 text-indigo-400" />
           </div>
           <div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Infinite Practice</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Infinite Practice</h2>
             <p className="text-slate-400 mt-1 text-sm max-w-xl leading-relaxed">
               Endless, procedurally generated drills. Every answer updates your BKT skill mastery.
             </p>
@@ -173,16 +181,28 @@ const InfinitePractice = ({ user, onLogout }) => {
           <div className="p-6 md:p-8 space-y-6">
             {/* Skill + live mastery */}
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/15">
-                {SKILL_LABELS[activeSkill] || activeSkill?.replace('_', ' ')}
-              </span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/15">
+                  {SKILL_LABELS[activeSkill] || activeSkill?.replace('_', ' ')}
+                </span>
+                {LESSON_BY_SKILL[activeSkill] && (
+                  <Link
+                    to={`/learn/${LESSON_BY_SKILL[activeSkill].slug}`}
+                    className="text-xs font-semibold text-slate-400 hover:text-indigo-300 transition flex items-center gap-1"
+                    title={`Read the ${SKILL_LABELS[activeSkill]} lesson`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5" /> Lesson
+                  </Link>
+                )}
+              </div>
               {activeMastery != null && (
                 <div className="flex items-center gap-2 min-w-[180px]">
                   <span className="text-xs text-slate-500 font-semibold">Mastery</span>
                   <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        activeMastery >= MASTERY_THRESHOLD ? 'bg-emerald-500' : 'bg-indigo-500'
+                        isMastered(activeMastery, profile?.skill_observations?.[activeSkill])
+                          ? 'bg-emerald-500' : 'bg-indigo-500'
                       }`}
                       style={{ width: `${Math.round(activeMastery * 100)}%` }}
                     />

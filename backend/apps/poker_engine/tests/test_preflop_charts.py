@@ -71,3 +71,47 @@ class TestBoundaryHands:
     def test_boundary_out_hands_are_out_of_range(self, position):
         for klass in pc.BOUNDARY_HANDS[position]['out']:
             assert not pc.is_in_opening_range(position, klass), (position, klass)
+
+
+class TestHeadsUpCharts:
+    """Heads-up SB/Button open and BB defend charts."""
+
+    def test_sb_opens_wider_than_a_6max_button(self):
+        # Heads-up the Button only has to get through one player, so its open is
+        # strictly wider than the widest 6-max opening position.
+        assert pc.RFI_RANGES['BTN'] < pc.HU_RANGES['SB']
+
+    def test_premiums_are_in_both_charts(self):
+        for klass in ('AA', 'KK', 'AKs', 'AKo', 'AQo'):
+            assert pc.is_hu_open(klass), klass
+            assert pc.is_hu_defend(klass), klass
+
+    def test_worst_offsuit_is_in_neither_chart(self):
+        for klass in ('32o', '42o', '52o', '72o'):
+            assert not pc.is_hu_open(klass), klass
+            assert not pc.is_hu_defend(klass), klass
+
+    def test_all_pairs_and_suited_are_played(self):
+        # Both heads-up charts continue every pair and every suited hand.
+        for klass in pc.ALL_HAND_CLASSES:
+            if len(klass) == 2 or klass[2] == 's':
+                assert pc.is_hu_open(klass), klass
+                assert pc.is_hu_defend(klass), klass
+
+    def test_range_fractions_are_plausible(self):
+        sb = pc.hu_range_fraction('SB')
+        bb = pc.hu_range_fraction('BB')
+        # SB opens very wide (~80%); BB defends wide but tighter than the open.
+        assert 0.75 < sb < 0.90, sb
+        assert 0.50 < bb < 0.70, bb
+        assert bb < sb
+
+    @pytest.mark.parametrize('role,check', [('SB', pc.is_hu_open), ('BB', pc.is_hu_defend)])
+    def test_boundary_in_hands_are_in_range(self, role, check):
+        for klass in pc.HU_BOUNDARY_HANDS[role]['in']:
+            assert check(klass), (role, klass)
+
+    @pytest.mark.parametrize('role,check', [('SB', pc.is_hu_open), ('BB', pc.is_hu_defend)])
+    def test_boundary_out_hands_are_out_of_range(self, role, check):
+        for klass in pc.HU_BOUNDARY_HANDS[role]['out']:
+            assert not check(klass), (role, klass)

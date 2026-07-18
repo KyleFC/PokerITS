@@ -1,19 +1,17 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import { MASTERY_THRESHOLD } from '../constants';
+import { isMastered as isMasteredGate } from '../constants';
 
-// BKT parameters (same as backend DEFAULT_PARAMS)
-const BKT_PARAMS = {
-  p_l0: 0.30,    // Prior knowledge
-  p_t: 0.10,     // Transition/Learning
-  p_g: 0.25,     // Guess
-  p_s: 0.10,     // Slip
-};
+// Fallback BKT params for the detail view when a per-skill set isn't supplied.
+const DEFAULT_BKT_PARAMS = { p_l0: 0.30, p_t: 0.06, p_g: 0.40, p_s: 0.10 };
 
-// One BKT skill progress card for the dashboard grid.
-const SkillCard = ({ label, value, showDetails = false }) => {
+// One BKT skill progress card for the dashboard grid. `observationCount` gates
+// the "Mastered" badge (a high estimate on too little evidence isn't mastery);
+// `params` supplies the per-skill BKT values for the detail view.
+const SkillCard = ({ label, value, observationCount, params, showDetails = false }) => {
   const masteryValue = value;
-  const isMastered = masteryValue >= MASTERY_THRESHOLD;
+  const bkt = params || DEFAULT_BKT_PARAMS;
+  const isMastered = isMasteredGate(masteryValue, observationCount);
   const percentage = Math.round(masteryValue * 100);
 
   if (showDetails) {
@@ -35,7 +33,7 @@ const SkillCard = ({ label, value, showDetails = false }) => {
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                className="h-full bg-indigo-500 rounded-full"
                 style={{ width: `${masteryValue * 100}%` }}
               />
             </div>
@@ -46,13 +44,13 @@ const SkillCard = ({ label, value, showDetails = false }) => {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-semibold text-slate-300">Slip</span>
               <span className="text-xs font-bold text-rose-400">
-                {(BKT_PARAMS.p_s * 100).toFixed(1)}%
+                {(bkt.p_s * 100).toFixed(1)}%
               </span>
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"
-                style={{ width: `${BKT_PARAMS.p_s * 100}%` }}
+                className="h-full bg-rose-500 rounded-full"
+                style={{ width: `${bkt.p_s * 100}%` }}
               />
             </div>
           </div>
@@ -62,13 +60,13 @@ const SkillCard = ({ label, value, showDetails = false }) => {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-semibold text-slate-300">Guess</span>
               <span className="text-xs font-bold text-amber-400">
-                {(BKT_PARAMS.p_g * 100).toFixed(1)}%
+                {(bkt.p_g * 100).toFixed(1)}%
               </span>
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full"
-                style={{ width: `${BKT_PARAMS.p_g * 100}%` }}
+                className="h-full bg-amber-500 rounded-full"
+                style={{ width: `${bkt.p_g * 100}%` }}
               />
             </div>
           </div>
@@ -78,13 +76,13 @@ const SkillCard = ({ label, value, showDetails = false }) => {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-semibold text-slate-300">Transition</span>
               <span className="text-xs font-bold text-cyan-400">
-                {(BKT_PARAMS.p_t * 100).toFixed(1)}%
+                {(bkt.p_t * 100).toFixed(1)}%
               </span>
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-                style={{ width: `${BKT_PARAMS.p_t * 100}%` }}
+                className="h-full bg-sky-500 rounded-full"
+                style={{ width: `${bkt.p_t * 100}%` }}
               />
             </div>
           </div>
@@ -118,7 +116,7 @@ const SkillCard = ({ label, value, showDetails = false }) => {
         </div>
         <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${isMastered ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
+            className={`h-full rounded-full transition-all duration-500 ${isMastered ? 'bg-emerald-500' : 'bg-indigo-500'}`}
             style={{ width: `${percentage}%` }}
           />
         </div>

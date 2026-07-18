@@ -18,7 +18,9 @@
       "PowerShell($c = Get-Command node -ErrorAction SilentlyContinue; if \\($c\\) { $c.Source } else { \"node not found on PATH\" }; Get-ChildItem \"$env:ProgramFiles\\\\nodejs\\\\npm.cmd\",\"$env:APPDATA\\\\npm\\\\npm.cmd\",\"$env:LOCALAPPDATA\\\\nvm\" -ErrorAction SilentlyContinue | Select-Object -First 5 FullName)",
       "Skill(run)",
       "Skill(run:*)",
-      "mcp__claude-in-chrome__tabs_context_mcp"
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "Bash(grep -rn \"total_pot_amount\\\\|def pot_amounts\\\\|def bets\\\\|total_bet\\\\|pot_amount\" \"C:\\\\Users\\\\epicb\\\\anaconda3\\\\Lib\\\\site-packages\\\\pokerkit\\\\state.py\" | head -40)",
+      "Bash(python -m pytest apps/poker_engine apps/student_model -q)"
     ]
   }
 }

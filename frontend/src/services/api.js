@@ -39,9 +39,16 @@ api.interceptors.response.use(
             refresh: refreshToken,
           });
           
-          const { access } = response.data;
+          const { access, refresh } = response.data;
           localStorage.setItem('access_token', access);
-          
+          // The backend rotates refresh tokens (ROTATE_REFRESH_TOKENS=True):
+          // each refresh response carries a new refresh token that must replace
+          // the old one, otherwise the session hard-expires 7 days after login
+          // no matter how active the user is.
+          if (refresh) {
+            localStorage.setItem('refresh_token', refresh);
+          }
+
           // Retry the original request with the new token
           originalRequest.headers.Authorization = `Bearer ${access}`;
           return api(originalRequest);
@@ -105,10 +112,37 @@ export const studentService = {
     return response.data;
   },
   
-  getHistory: async (skill = '') => {
-    const url = skill ? `/student/history/?skill=${skill}` : '/student/history/';
-    const response = await api.get(url);
+  getHistory: async (skill = '', page = 1) => {
+    const params = new URLSearchParams();
+    if (skill) params.set('skill', skill);
+    if (page > 1) params.set('page', String(page));
+    const qs = params.toString();
+    const response = await api.get(`/student/history/${qs ? `?${qs}` : ''}`);
+    // DRF-paginated: { count, next, previous, results }.
     return response.data;
+  },
+
+  // Walk the paginated observation log until exhausted (or a safety cap) and
+  // return all observations oldest-first, ready to plot as a timeline.
+  getFullHistory: async (skill = '', maxPages = 20) => {
+    // Fetch page 1 first to learn the total count, then fetch the remaining
+    // pages in parallel rather than walking them one blocking request at a
+    // time (which serialized up to `maxPages` round-trips before the timeline
+    // could render).
+    const first = await studentService.getHistory(skill, 1);
+    const all = [...first.results];
+    const pageSize = first.results.length || 1;
+    const totalPages = Math.min(maxPages, Math.ceil((first.count || 0) / pageSize));
+    if (first.next && totalPages > 1) {
+      const rest = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) =>
+          studentService.getHistory(skill, i + 2)
+        )
+      );
+      for (const data of rest) all.push(...data.results);
+    }
+    // The API serves newest-first; timelines want oldest-first.
+    return all.reverse();
   },
 };
 
@@ -141,6 +175,79 @@ export const pokerService = {
   // to the static quiz view).
   getScenarioReplay: async (id) => {
     const response = await api.get(`/poker/scenarios/${id}/replay/`);
+    return response.data;
+  },
+
+  // Fetch the static preflop charts (6-max RFI + heads-up), expanded to hand
+  // classes, for the range-viewer page. Same source of truth the graders use.
+  getPreflopRanges: async () => {
+    const response = await api.get('/poker/ranges/');
+    return response.data;
+  },
+
+  // Deal a new live heads-up hand vs the rule-based bot. Returns
+  // { hand_id, profile, frame } where frame is the first hero decision.
+  startHand: async (profile = 'balanced', stack = 100) => {
+    const response = await api.post('/poker/hands/', { profile, stack });
+    return response.data;
+  },
+
+  // Submit the hero's action for a live hand. The backend advances the bot
+  // inline and returns { frame, observation, complete, profile }. `action` is
+  // { type: 'fold'|'check'|'call'|'raise_to', amount_bb? }.
+  submitHandAction: async (handId, action) => {
+    const response = await api.post(`/poker/hands/${handId}/action/`, action);
+    return response.data;
+  },
+
+  // Aggregated Arena session stats over the user's completed hands:
+  // { hands_played, net_bb_total, bb_per_100, record, showdown, non_showdown,
+  //   ev_loss_total_bb, ev_loss_per_hand_bb, ev_loss_by_street, preflop,
+  //   by_profile, timeline }.
+  getHandStats: async () => {
+    const response = await api.get('/poker/hands/stats/');
+    return response.data;
+  },
+
+  // DRF-paginated list of the user's completed hands, newest first, with the
+  // EV ground truth captured at play time (for the Module 4 hand review).
+  getHandHistory: async (page = 1) => {
+    const url = page > 1 ? `/poker/hands/history/?page=${page}` : '/poker/hands/history/';
+    const response = await api.get(url);
+    return response.data;
+  },
+};
+
+// Exploit Lab (Module 5): heads-up "diagnose the mystery opponent" matches.
+// The bot's identity never appears in any response until the match completes —
+// clients render only phase/counters/HUD until then, and the reveal on the
+// completed-match GET. Hero actions reuse pokerService.submitHandAction.
+export const exploitService = {
+  // Start a match at 'easy' | 'medium' | 'hard'. Returns the leakage-safe match
+  // state: { match_id, difficulty, phase, scout_target, exploit_target,
+  //          scout_played, exploit_played, hud?, active_hand_id }.
+  startMatch: async (difficulty = 'easy') => {
+    const response = await api.post('/poker/exploit/matches/', { difficulty });
+    return response.data;
+  },
+
+  // Current match state; includes `reveal` once phase === 'complete'.
+  getMatch: async (id) => {
+    const response = await api.get(`/poker/exploit/matches/${id}/`);
+    return response.data;
+  },
+
+  // Deal (or resume) the next hand. Returns { hand_id, frame, phase,
+  // hands_remaining }. 409s outside the scout/exploit phases.
+  dealHand: async (id) => {
+    const response = await api.post(`/poker/exploit/matches/${id}/hands/`);
+    return response.data;
+  },
+
+  // Submit the diagnosis at the checkpoint. Returns { read_correct,
+  // adjustment_correct, correct_read, correct_adjustment, phase, hud?, profile }.
+  submitDiagnosis: async (id, read, adjustment) => {
+    const response = await api.post(`/poker/exploit/matches/${id}/diagnosis/`, { read, adjustment });
     return response.data;
   },
 };

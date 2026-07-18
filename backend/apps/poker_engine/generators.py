@@ -28,7 +28,11 @@ from apps.poker_engine import preflop_charts
 # Bump when a generator change would alter the answer for an existing id. Old
 # ids carrying a different version simply stop resolving (graded as not-found)
 # instead of grading against content the student never saw.
-VERSION = 'v1'
+# v2: the preflop RFI/HU charts were retuned (see preflop_charts), which changes
+# the correct answer for preflop_range ids. Bumping retires ids issued under the
+# old charts so they resolve as not-found rather than being silently regraded
+# against content the student never saw.
+VERSION = 'v2'
 
 _ID_PREFIX = 'gen'
 

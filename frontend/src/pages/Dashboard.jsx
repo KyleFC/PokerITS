@@ -1,12 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, XCircle, RefreshCw, BarChart2, BookOpen, Infinity as InfinityIcon, ArrowRight } from 'lucide-react';
+import { Trophy, XCircle, RefreshCw, BarChart2, BookOpen, Infinity as InfinityIcon, ArrowRight, Swords, Grid3x3, LineChart, GraduationCap } from 'lucide-react';
 import { studentService, pokerService } from '../services/api';
-import { SKILL_LABELS, MASTERY_THRESHOLD } from '../constants';
+import { SKILL_LABELS, BKT_PARAMS_BY_SKILL, isMastered } from '../constants';
 import PageLayout from '../components/PageLayout';
 import SkillCard from '../components/SkillCard';
 import ScenarioCard from '../components/ScenarioCard';
 import HandReplayModal from '../components/HandReplayModal';
+
+// The primary navigation targets, rendered as a compact grid. One accent color
+// (indigo) is used throughout; the per-card icon is the only visual differentiator.
+const NAV_CARDS = [
+  {
+    to: '/learn',
+    icon: GraduationCap,
+    title: 'Learning Center',
+    blurb: 'Eight interactive lessons covering every skill the tutor grades — pot odds, equity, MDF, ranges and more.',
+  },
+  {
+    to: '/practice',
+    icon: InfinityIcon,
+    title: 'Infinite Practice',
+    blurb: 'Endless procedurally generated drills that adapt to your weakest skills. Every answer feeds your BKT mastery.',
+  },
+  {
+    to: '/arena',
+    icon: Swords,
+    title: 'Heads Up Arena',
+    blurb: 'Play real heads-up hands against exploitable bot profiles. Every decision is graded on EV — win or lose.',
+  },
+  {
+    to: '/analytics',
+    icon: LineChart,
+    title: 'Learning Analytics',
+    blurb: 'Mastery timelines for every skill, remediation flags, and a review list of your Arena hands.',
+  },
+  {
+    to: '/ranges',
+    icon: Grid3x3,
+    title: 'Range Charts',
+    blurb: 'Visual reference for every preflop chart the tutor grades against — 6-max opening ranges and heads-up play.',
+  },
+];
 
 const Dashboard = ({ user, onLogout }) => {
   const [profile, setProfile] = useState(null);
@@ -62,21 +97,25 @@ const Dashboard = ({ user, onLogout }) => {
       )}
 
       {/* Hero Welcome */}
-      <section className="bg-gradient-to-r from-slate-900 to-indigo-950/40 border border-slate-800 rounded-3xl p-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Welcome back, {user?.username}!</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Welcome back, {user?.username}</h2>
           <p className="text-slate-400 mt-2 text-sm md:text-base max-w-xl leading-relaxed">
             Poker ITS tracks your performance across core theoretical metrics. Practice with the diagnostic quiz bank below.
           </p>
         </div>
         <div className="flex gap-4">
-          <div className="bg-slate-950/60 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 shadow-inner">
+          <div className="bg-slate-950/60 border border-slate-800 p-4 rounded-xl flex items-center gap-3">
             <Trophy className="h-8 w-8 text-amber-400" />
             <div>
               <span className="text-xs text-slate-500 uppercase tracking-wider font-bold block">Mastered</span>
               <span className="text-lg font-bold text-slate-200">
-                {profile ? Object.values(profile.skills).filter((v) => v >= MASTERY_THRESHOLD).length : 0}/5
+                {profile
+                  ? Object.entries(profile.skills).filter(
+                      ([s, v]) => isMastered(v, profile.skill_observations?.[s])
+                    ).length
+                  : 0}
+                /{profile ? Object.keys(profile.skills).length : 0}
               </span>
             </div>
           </div>
@@ -115,34 +154,36 @@ const Dashboard = ({ user, onLogout }) => {
               key={skillName}
               label={SKILL_LABELS[skillName] || skillName}
               value={value}
+              observationCount={profile.skill_observations?.[skillName]}
+              params={BKT_PARAMS_BY_SKILL[skillName]}
               showDetails={showBKTDetails}
             />
           ))}
         </div>
       </section>
 
-      {/* Infinite Practice entry point */}
-      <section className="mb-12">
-        <Link
-          to="/practice"
-          className="group block bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/20 hover:border-indigo-500/50 rounded-3xl p-6 shadow-xl transition relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-center justify-between gap-4 relative">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-tr from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/20">
-                <InfinityIcon className="h-7 w-7 text-white" />
+      {/* Primary navigation */}
+      <section className="mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {NAV_CARDS.map(({ to, icon: Icon, title, blurb }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group block bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl p-5 transition"
+          >
+            <div className="flex items-start gap-3">
+              <div className="bg-slate-800 border border-slate-700 p-2.5 rounded-lg shrink-0">
+                <Icon className="h-6 w-6 text-indigo-400" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition">Infinite Practice</h3>
-                <p className="text-slate-400 text-sm mt-1 max-w-xl leading-relaxed">
-                  Endless procedurally generated drills that adapt to your weakest skills. Every answer feeds your BKT mastery.
-                </p>
+              <div className="min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition">{title}</h3>
+                  <ArrowRight className="h-4 w-4 text-slate-500 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-indigo-400" />
+                </div>
+                <p className="text-slate-400 text-sm mt-1 leading-relaxed">{blurb}</p>
               </div>
             </div>
-            <ArrowRight className="h-6 w-6 text-indigo-400 shrink-0 transition-transform group-hover:translate-x-1" />
-          </div>
-        </Link>
+          </Link>
+        ))}
       </section>
 
       {/* Scenario Diagnostic Bank */}

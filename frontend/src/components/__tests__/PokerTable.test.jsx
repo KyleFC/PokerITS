@@ -34,7 +34,8 @@ describe('PokerTable', () => {
 
   it('shows per-seat action badges', () => {
     render(<PokerTable frame={frame} seats={['BB', 'BTN']} hero="BB" />);
-    expect(screen.getByText('Bet')).toBeInTheDocument(); // BTN's last action
+    // A bet renders as a text-free chip icon, exposed via its aria-label.
+    expect(screen.getByLabelText('Bet')).toBeInTheDocument(); // BTN's last action
   });
 
   it('marks folded seats with a Fold badge', () => {

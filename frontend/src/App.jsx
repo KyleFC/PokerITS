@@ -7,6 +7,13 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Tutorial from './pages/Tutorial';
 import InfinitePractice from './pages/InfinitePractice';
+import HeadsUpArena from './pages/HeadsUpArena';
+import ExploitLab from './pages/ExploitLab';
+import ArenaStats from './pages/ArenaStats';
+import Analytics from './pages/Analytics';
+import RangeCharts from './pages/RangeCharts';
+import LearnHub from './pages/LearnHub';
+import LearnLesson from './pages/LearnLesson';
 
 export default function App() {
   const [auth, setAuth] = useState(authService.isAuthenticated());
@@ -66,6 +73,36 @@ export default function App() {
         <Route
           path="/practice"
           element={auth ? <InfinitePractice user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/arena"
+          element={auth ? <HeadsUpArena user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/arena/stats"
+          element={auth ? <ArenaStats user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/exploit"
+          element={auth ? <ExploitLab user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        {/* Live Play became the Heads Up Arena; keep old links working. */}
+        <Route path="/play" element={<Navigate to="/arena" replace />} />
+        <Route
+          path="/analytics"
+          element={auth ? <Analytics user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/ranges"
+          element={auth ? <RangeCharts user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/learn"
+          element={auth ? <LearnHub user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/learn/:slug"
+          element={auth ? <LearnLesson user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

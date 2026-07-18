@@ -10,19 +10,24 @@ const PageLayout = ({ children, onLogout, user }) => {
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-tr from-indigo-500 to-purple-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
+            <div className="bg-indigo-600 p-2 rounded-lg">
               <BrainCircuit className="h-6 w-6 text-white" />
             </div>
             <div>
-              <span className="font-bold text-lg bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Poker ITS</span>
+              <span className="font-bold text-lg text-slate-100">Poker ITS</span>
               <span className="text-xs block text-slate-400 font-medium">Intelligent Tutoring System</span>
             </div>
           </div>
 
           <nav className="flex items-center gap-6">
             <Link to="/" className="text-sm font-medium text-slate-300 hover:text-white transition">Dashboard</Link>
+            <Link to="/learn" className="text-sm font-medium text-slate-300 hover:text-white transition">Learn</Link>
             <Link to="/practice" className="text-sm font-medium text-slate-300 hover:text-white transition">Infinite Practice</Link>
-            <Link to="/tutorial" className="text-sm font-medium text-slate-300 hover:text-white transition">Tutorial</Link>
+            <Link to="/arena" className="text-sm font-medium text-slate-300 hover:text-white transition">Arena</Link>
+            <Link to="/exploit" className="text-sm font-medium text-slate-300 hover:text-white transition">Exploit Lab</Link>
+            <Link to="/analytics" className="text-sm font-medium text-slate-300 hover:text-white transition">Analytics</Link>
+            {/* Tutorial moved under the Learning Center (hub "Fundamentals" card). */}
+            <Link to="/ranges" className="text-sm font-medium text-slate-300 hover:text-white transition">Ranges</Link>
             {user && (
               <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
                 <div className="flex items-center gap-2">

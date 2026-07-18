@@ -5,6 +5,7 @@ SOURCE_CHOICES = [
     ('quiz', 'Quiz'),
     ('infinite', 'Generated Quiz'),
     ('hand', 'Live Hand'),
+    ('exploit', 'Exploit Lab'),
 ]
 
 class SkillObservation(models.Model):
@@ -21,6 +22,7 @@ class SkillObservation(models.Model):
             ('pot_odds', 'Pot Odds'),
             ('implied_odds', 'Implied Odds'),
             ('mdf', 'Minimum Defense Frequency'),
+            ('opponent_reading', 'Opponent Reading'),
         ]
     )
     timestamp = models.DateTimeField(auto_now_add=True)

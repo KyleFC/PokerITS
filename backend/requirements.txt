@@ -8,3 +8,6 @@ python-dotenv>=1.0
 pytest>=8.0
 pytest-django>=4.8
 dj-database-url>=2.1
+# PostgreSQL driver — the production database target (project.md §3; SQLite is
+# local-dev only). The binary wheel needs no local build toolchain.
+psycopg[binary]>=3.1

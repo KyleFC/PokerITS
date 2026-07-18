@@ -9,6 +9,7 @@ SKILL_CHOICES = [
     ('pot_odds', 'Pot Odds'),
     ('implied_odds', 'Implied Odds'),
     ('mdf', 'Minimum Defense Frequency'),
+    ('opponent_reading', 'Opponent Reading'),
 ]
 
 # A new student's starting mastery per skill IS the BKT prior P(L0) for that

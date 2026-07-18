@@ -4,10 +4,9 @@
   body {
     background-color: #0b0f19;
     color: #f3f4f6;
-    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  /* Custom glassmorphism scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -16,24 +15,10 @@
     background: rgba(15, 23, 42, 0.3);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3);
+    background: #334155; /* slate-700 */
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.5);
+    background: #475569; /* slate-600 */
   }
-}
-
-/* Custom premium glow animations */
-@keyframes pulseGlow {
-  0%, 100% {
-    text-shadow: 0 0 10px rgba(99, 102, 241, 0.4), 0 0 20px rgba(99, 102, 241, 0.2);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 30px rgba(99, 102, 241, 0.4);
-  }
-}
-
-.glow-text {
-  animation: pulseGlow 3s infinite;
 }

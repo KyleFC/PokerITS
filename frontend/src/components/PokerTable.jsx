@@ -23,11 +23,12 @@ const SEAT_RY = 36;
 const CHIP_RATIO = 0.52; // bet chips sit partway between a seat and the centre
 const TABLE_HEIGHT = 450;
 
+// "Bet" is deliberately absent: a bet renders as a text-free chip icon below,
+// not a text badge.
 const BADGE_STYLES = {
   Fold: 'bg-slate-800 text-slate-400 border-slate-700',
   Check: 'bg-slate-700 text-slate-200 border-slate-600',
   Call: 'bg-sky-600 text-white border-sky-400',
-  Bet: 'bg-emerald-600 text-white border-emerald-400',
   Raise: 'bg-amber-500 text-slate-900 border-amber-300',
 };
 
@@ -72,7 +73,11 @@ const SeatPod = ({ seat, frame, isHero, isButton }) => {
         </span>
       )}
       {badge === 'Bet' && (
-        <span className="z-20 h-5 w-5 rounded-full bg-amber-400 border-2 border-amber-200 shadow flex items-center justify-center" />
+        <span
+          role="img"
+          aria-label="Bet"
+          className="z-20 h-5 w-5 rounded-full bg-amber-400 border-2 border-amber-200 shadow flex items-center justify-center"
+        />
       )}
 
       {/* Avatar + name/stack, Stake-style pill */}

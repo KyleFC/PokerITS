@@ -30,8 +30,10 @@ frontend/.env
 .coverage
 htmlcov/
 .tox/
-.claude/
-*.md
+
+# Claude Code local settings (shared settings.local.json stays tracked)
+.claude/*
+!.claude/settings.local.json
 
 # ---- Node / Vite / Frontend ----
 node_modules/

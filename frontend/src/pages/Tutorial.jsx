@@ -209,66 +209,30 @@ const HandRankingsContent = () => (
       At showdown (when all betting is complete), the player with the best 5-card hand wins the pot. Here are all poker hands ranked from strongest to weakest:
     </p>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-yellow-300 mb-2">🥇 Royal Flush</h4>
-        <p className="text-sm text-slate-300 mb-3">A-K-Q-J-10 same suit</p>
-        <p className="font-mono text-sm text-yellow-200">A♥ K♥ Q♥ J♥ 10♥</p>
-      </div>
-
-      <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-cyan-300 mb-2">🥈 Straight Flush</h4>
-        <p className="text-sm text-slate-300 mb-3">5 cards in sequence, same suit</p>
-        <p className="font-mono text-sm text-cyan-200">9♠ 8♠ 7♠ 6♠ 5♠</p>
-      </div>
-
-      <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-orange-300 mb-2">🥉 Four of a Kind</h4>
-        <p className="text-sm text-slate-300 mb-3">Four cards same rank</p>
-        <p className="font-mono text-sm text-orange-200">K♥ K♦ K♠ K♣ Q♥</p>
-      </div>
-
-      <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-purple-300 mb-2">4️⃣ Full House</h4>
-        <p className="text-sm text-slate-300 mb-3">Three of a kind + pair</p>
-        <p className="font-mono text-sm text-purple-200">Q♥ Q♦ Q♠ 7♣ 7♥</p>
-      </div>
-
-      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-green-300 mb-2">5️⃣ Flush</h4>
-        <p className="text-sm text-slate-300 mb-3">5 cards same suit</p>
-        <p className="font-mono text-sm text-green-200">K♣ J♣ 9♣ 5♣ 3♣</p>
-      </div>
-
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-        <h4 className="font-bold text-blue-300 mb-2">6️⃣ Straight</h4>
-        <p className="text-sm text-slate-300 mb-3">5 cards in sequence</p>
-        <p className="font-mono text-sm text-blue-200">10♥ 9♦ 8♠ 7♣ 6♥</p>
-      </div>
-
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-        <h4 className="font-bold text-slate-200 mb-2">7️⃣ Three of a Kind</h4>
-        <p className="text-sm text-slate-300 mb-3">Three cards same rank</p>
-        <p className="font-mono text-sm text-slate-300">8♥ 8♦ 8♠ K♣ J♥</p>
-      </div>
-
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-        <h4 className="font-bold text-slate-200 mb-2">8️⃣ Two Pair</h4>
-        <p className="text-sm text-slate-300 mb-3">Two pairs of cards</p>
-        <p className="font-mono text-sm text-slate-300">J♥ J♦ 5♠ 5♣ 2♥</p>
-      </div>
-
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-        <h4 className="font-bold text-slate-200 mb-2">9️⃣ One Pair</h4>
-        <p className="text-sm text-slate-300 mb-3">Two cards same rank</p>
-        <p className="font-mono text-sm text-slate-300">4♥ 4♦ A♠ K♣ Q♥</p>
-      </div>
-
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-        <h4 className="font-bold text-slate-200 mb-2">🔟 High Card</h4>
-        <p className="text-sm text-slate-300 mb-3">No combination</p>
-        <p className="font-mono text-sm text-slate-300">K♥ J♦ 9♠ 6♣ 3♥</p>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {[
+        { rank: 1, name: 'Royal Flush', desc: 'A-K-Q-J-10 same suit', example: 'A♥ K♥ Q♥ J♥ 10♥' },
+        { rank: 2, name: 'Straight Flush', desc: '5 cards in sequence, same suit', example: '9♠ 8♠ 7♠ 6♠ 5♠' },
+        { rank: 3, name: 'Four of a Kind', desc: 'Four cards same rank', example: 'K♥ K♦ K♠ K♣ Q♥' },
+        { rank: 4, name: 'Full House', desc: 'Three of a kind + pair', example: 'Q♥ Q♦ Q♠ 7♣ 7♥' },
+        { rank: 5, name: 'Flush', desc: '5 cards same suit', example: 'K♣ J♣ 9♣ 5♣ 3♣' },
+        { rank: 6, name: 'Straight', desc: '5 cards in sequence', example: '10♥ 9♦ 8♠ 7♣ 6♥' },
+        { rank: 7, name: 'Three of a Kind', desc: 'Three cards same rank', example: '8♥ 8♦ 8♠ K♣ J♥' },
+        { rank: 8, name: 'Two Pair', desc: 'Two pairs of cards', example: 'J♥ J♦ 5♠ 5♣ 2♥' },
+        { rank: 9, name: 'One Pair', desc: 'Two cards same rank', example: '4♥ 4♦ A♠ K♣ Q♥' },
+        { rank: 10, name: 'High Card', desc: 'No combination', example: 'K♥ J♦ 9♠ 6♣ 3♥' },
+      ].map(({ rank, name, desc, example }) => (
+        <div key={rank} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 flex items-start gap-3">
+          <span className="w-7 h-7 shrink-0 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 tabular-nums">
+            {rank}
+          </span>
+          <div>
+            <h4 className="font-bold text-slate-100 mb-1">{name}</h4>
+            <p className="text-sm text-slate-400 mb-2">{desc}</p>
+            <p className="font-mono text-sm text-slate-300">{example}</p>
+          </div>
+        </div>
+      ))}
     </div>
 
   </>
@@ -283,8 +247,8 @@ const PositionContent = () => (
     <h3 className="font-bold text-lg text-white mb-4">The Three Positions</h3>
 
     <div className="space-y-4 mb-8">
-      <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-lg p-6">
-        <h4 className="font-semibold text-red-300 text-lg mb-3">Early Position (Worst)</h4>
+      <div className="bg-rose-500/10 border border-rose-500/30 rounded-lg p-6">
+        <h4 className="font-semibold text-rose-300 text-lg mb-3">Early Position (Worst)</h4>
         <p className="text-sm mb-3">Sitting right after the big blind. You act first and know the least about what others will do.</p>
         <div className="bg-slate-800/40 rounded p-4 text-sm space-y-2">
           <p><strong>✕ Disadvantage:</strong> Everyone will act after you</p>
@@ -293,8 +257,8 @@ const PositionContent = () => (
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/30 rounded-lg p-6">
-        <h4 className="font-semibold text-yellow-300 text-lg mb-3">Middle Position (Moderate)</h4>
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6">
+        <h4 className="font-semibold text-amber-300 text-lg mb-3">Middle Position (Moderate)</h4>
         <p className="text-sm mb-3">Sitting in the middle of the action. Some players act before you, some after.</p>
         <div className="bg-slate-800/40 rounded p-4 text-sm space-y-2">
           <p><strong>⚖ Trade-off:</strong> Less advantage than button, more than early</p>
@@ -303,8 +267,8 @@ const PositionContent = () => (
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg p-6">
-        <h4 className="font-semibold text-green-300 text-lg mb-3">Late Position (Best)</h4>
+      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6">
+        <h4 className="font-semibold text-emerald-300 text-lg mb-3">Late Position (Best)</h4>
         <p className="text-sm mb-3">The button (last to act). You have the biggest advantage—see everyone's actions first.</p>
         <div className="bg-slate-800/40 rounded p-4 text-sm space-y-2">
           <p><strong>✓ Advantage:</strong> Last to act on every betting round</p>
@@ -316,26 +280,17 @@ const PositionContent = () => (
 
     <h3 className="font-bold text-lg text-white mb-4">Why Position Matters</h3>
     <div className="bg-slate-800/40 rounded-lg p-6 space-y-4">
-      <div className="flex gap-4">
-        <div className="text-2xl">📍</div>
-        <div>
-          <p className="font-semibold text-slate-100 mb-1">Information Advantage</p>
-          <p className="text-sm text-slate-300">Acting last means you know what everyone does before you decide</p>
-        </div>
+      <div className="border-l-2 border-slate-700 pl-4">
+        <p className="font-semibold text-slate-100 mb-1">Information Advantage</p>
+        <p className="text-sm text-slate-300">Acting last means you know what everyone does before you decide</p>
       </div>
-      <div className="flex gap-4">
-        <div className="text-2xl">💪</div>
-        <div>
-          <p className="font-semibold text-slate-100 mb-1">Control the Pot Size</p>
-          <p className="text-sm text-slate-300">You can check behind (not bet) to keep the pot small, or bet large to build it</p>
-        </div>
+      <div className="border-l-2 border-slate-700 pl-4">
+        <p className="font-semibold text-slate-100 mb-1">Control the Pot Size</p>
+        <p className="text-sm text-slate-300">You can check behind (not bet) to keep the pot small, or bet large to build it</p>
       </div>
-      <div className="flex gap-4">
-        <div className="text-2xl">🎯</div>
-        <div>
-          <p className="font-semibold text-slate-100 mb-1">Steal Blinds</p>
-          <p className="text-sm text-slate-300">From late position, you can raise weak hands hoping others fold</p>
-        </div>
+      <div className="border-l-2 border-slate-700 pl-4">
+        <p className="font-semibold text-slate-100 mb-1">Steal Blinds</p>
+        <p className="text-sm text-slate-300">From late position, you can raise weak hands hoping others fold</p>
       </div>
     </div>
 
@@ -382,7 +337,7 @@ const BettingContent = () => (
       Pot odds tell you the ratio of money in the pot compared to how much you need to call. This helps you decide if calling is profitable.
     </p>
 
-    <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-lg p-6 mb-6">
+    <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-6 mb-6">
       <p className="text-sm font-mono text-indigo-200 mb-4">
         <strong>Pot Odds = (Money in pot) ÷ (Cost to call)</strong>
       </p>
@@ -399,13 +354,13 @@ const BettingContent = () => (
 
     <div className="space-y-4 mb-8">
       <div className="bg-rose-500/10 border border-rose-500/30 rounded-lg p-6">
-        <h4 className="font-semibold text-rose-300 mb-3">❌ Beginner Thinking</h4>
+        <h4 className="font-semibold text-rose-300 mb-3">Beginner Thinking</h4>
         <p className="text-sm text-slate-300">"What hand does my opponent have?"</p>
         <p className="text-xs text-slate-400 mt-2">Problem: You can't know their exact hand—you need to think about all possible hands they could have</p>
       </div>
 
-      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6">
-        <h4 className="font-semibold text-green-300 mb-3">✓ Advanced Thinking</h4>
+      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6">
+        <h4 className="font-semibold text-emerald-300 mb-3">Advanced Thinking</h4>
         <p className="text-sm text-slate-300">"What range of hands could my opponent have?"</p>
         <p className="text-xs text-slate-400 mt-2">Better approach: Consider the most likely hands based on their betting pattern</p>
       </div>

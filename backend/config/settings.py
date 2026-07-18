@@ -10,11 +10,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load .env file
 load_dotenv(BASE_DIR / '.env')
 
-# Security settings
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-secret-key-change-me')
+# Security settings.
+# Dev-permissive defaults (fallback key, DEBUG on, open hosts) are allowed
+# only while DEBUG is on; a production process (DEBUG=False) must supply its
+# own SECRET_KEY and ALLOWED_HOSTS or refuse to boot, rather than run quietly
+# with development credentials.
+from django.core.exceptions import ImproperlyConfigured
+
+_DEV_SECRET_KEY = 'django-insecure-development-secret-key-change-me'
+SECRET_KEY = os.getenv('SECRET_KEY', _DEV_SECRET_KEY)
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '*' if DEBUG else '').split(',') if h.strip()]
+
+if not DEBUG:
+    if SECRET_KEY == _DEV_SECRET_KEY:
+        raise ImproperlyConfigured('SECRET_KEY must be set when DEBUG=False.')
+    if not ALLOWED_HOSTS:
+        raise ImproperlyConfigured('ALLOWED_HOSTS must be set when DEBUG=False.')
 
 # Application definition
 INSTALLED_APPS = [

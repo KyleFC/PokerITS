@@ -216,6 +216,31 @@ gameplay decisions.
 - (Optional, lower priority) LLM-generated *post-hand* commentary only — gameplay decisions
   remain rule-based per §7.
 
+### Module 6 — Learning Center (curriculum / teaching pages)
+
+Rationale: Modules 1–4 measure and drill the five skills but never *teach* them — the only
+instructional surface was the rules Tutorial, and quiz explanations were dead ends. Module 6
+adds the human-authored curriculum layer of the ITS.
+
+- Frontend-only (no models, migrations, or new endpoints; read-only use of
+  `GET /api/poker/ranges/`). Lesson *reading* is deliberately untracked: mastery evidence
+  comes exclusively from graded practice via BKT, so lessons link into drills rather than
+  claiming completion.
+- `/learn` hub + `/learn/<slug>` lesson pages, 8 lessons: one per BKT skill
+  (preflop_range, equity_estimation, pot_odds, implied_odds, mdf) plus three supporting
+  concepts (EV & decision-vs-outcome, counting outs, bet sizing & alpha). Curriculum
+  metadata lives in `frontend/src/lessons/meta.js`; bodies are lazy-loaded per slug.
+- **Anti-drift constraint (critical):** every formula and number in lesson prose and
+  widgets is computed through `frontend/src/lessons/math.js`, a pure mirror of
+  `ev_eval.py` / `generators.py`, pinned by unit tests to backend-emitted values, so
+  lessons can never contradict the graders' explanations.
+- Interactive widgets per lesson (pot-odds calculator, MDF slider, outs gallery, EV
+  explorer, set-mine judge, range ladder, ...) — native inputs, no new dependencies.
+- Cross-links: `QuizResultPanel` "Learn more" (all three answer surfaces), Analytics
+  remediation "Read the lesson" chip, Dashboard entry card, Infinite Practice skill-row
+  lesson link. Sections carry stable anchor ids (`/learn/<slug>#<section>`) so the
+  Module 5 Explaining Coach can deep-link lesson material later.
+
 ## 9. Engineering Scaffolding Checklist (must exist before Module 1 is considered done)
 
 - [ ] `requirements.txt` / `pyproject.toml`

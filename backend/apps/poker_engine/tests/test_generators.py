@@ -65,7 +65,7 @@ class TestDeterminism:
 
     def test_generated_id_matches_requested_skill_and_seed(self):
         s = generators.generate('mdf', 123)
-        assert s['id'] == 'gen:mdf:v1:123'
+        assert s['id'] == f'gen:mdf:{generators.VERSION}:123'
         assert s['skill'] == 'mdf'
 
 

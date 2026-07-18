@@ -44,7 +44,7 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex bg-gradient-to-tr from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-xl shadow-indigo-500/25 mb-4">
+        <div className="inline-flex bg-indigo-600 p-3 rounded-xl mb-4">
           <BrainCircuit className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-3xl font-extrabold text-white tracking-tight">Create your account</h2>
@@ -57,7 +57,7 @@ const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-slate-900/50 border border-slate-800/80 backdrop-blur-md py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10">
+        <div className="bg-slate-900 border border-slate-800 py-8 px-4 sm:rounded-2xl sm:px-10">
           <form className="space-y-5" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm p-3 rounded-lg flex items-center gap-2">
@@ -135,7 +135,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-98"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {loading ? 'Creating...' : 'Create Account'}
             </button>
