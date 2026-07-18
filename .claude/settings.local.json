@@ -20,7 +20,9 @@
       "Skill(run:*)",
       "mcp__claude-in-chrome__tabs_context_mcp",
       "Bash(grep -rn \"total_pot_amount\\\\|def pot_amounts\\\\|def bets\\\\|total_bet\\\\|pot_amount\" \"C:\\\\Users\\\\epicb\\\\anaconda3\\\\Lib\\\\site-packages\\\\pokerkit\\\\state.py\" | head -40)",
-      "Bash(python -m pytest apps/poker_engine apps/student_model -q)"
+      "Bash(python -m pytest apps/poker_engine apps/student_model -q)",
+      "Bash(python -m pip install \"gunicorn>=22.0\" \"whitenoise>=6.7\")",
+      "Bash(python -m pytest apps/users/tests/test_auth.py::TestAuthentication::test_registration_success -q)"
     ]
   }
 }

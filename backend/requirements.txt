@@ -11,3 +11,10 @@ dj-database-url>=2.1
 # PostgreSQL driver — the production database target (project.md §3; SQLite is
 # local-dev only). The binary wheel needs no local build toolchain.
 psycopg[binary]>=3.1
+
+# --- Production serving (not used by `manage.py runserver` in local dev) ---
+# WSGI server Render invokes as the start command.
+gunicorn>=22.0
+# Serves collected static files (Django admin CSS/JS, DRF browsable API) straight
+# from the web process, so the demo needs no separate CDN or static host.
+whitenoise>=6.7
