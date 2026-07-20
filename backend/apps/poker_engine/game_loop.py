@@ -198,11 +198,26 @@ class HeadsUpHand:
         s = self._state
         seat_actions = self._seat_actions()
         if self.is_complete:
+            # Only real folds belong in `folded`: the HAND_KILLING automation
+            # flips the showdown *loser's* status to False, which _snapshot
+            # would otherwise present as a fold (greyed seat + Fold badge).
+            folded = [seat for seat in SEATS if any(
+                a['op'] == 'fold' and a['actor'] == seat for a in self.actions
+            )]
+            narration = (
+                f"{folded[0]} folds — hand over." if folded
+                else f"Showdown — {BOT} shows {' '.join(self._villain_hole)}."
+            )
             frame = _snapshot(s, SEATS, _HERO_INDEX, 'showdown',
-                              'Hand complete.', seat_actions=seat_actions)
+                              narration, seat_actions=seat_actions)
+            frame['folded'] = folded
             # Restore hero cards cleared by HAND_KILLING so the table still shows
             # them at showdown.
             frame['hero_cards'] = self._hero_hole
+            # At a real showdown the villain's hand is public: expose it so the
+            # table can turn their cards face-up instead of leaving card backs.
+            if not folded:
+                frame['revealed_cards'] = {BOT: self._villain_hole}
             frame['result'] = self.result()
             return frame
         kind = 'decision' if self.hero_to_act else 'action'

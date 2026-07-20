@@ -71,6 +71,20 @@ class TestPlayToShowdown:
         assert frame['kind'] == 'showdown'
         assert 'result' in frame
         assert len(frame['result']['villain_cards']) == 2
+        # Nobody folded, so nobody may be presented as folded — HAND_KILLING
+        # flips the showdown loser's status, which must not leak into the frame.
+        assert frame['folded'] == []
+        # The villain's now-public hand is exposed for face-up rendering.
+        assert frame['revealed_cards'] == {'BB': frame['result']['villain_cards']}
+        assert 'Showdown' in frame['narration']
+
+    def test_fold_ended_frame_marks_only_the_folder(self):
+        hand = HeadsUpHand.new(3)
+        hand.act_hero({'type': 'fold'})
+        frame = hand.current_frame()
+        assert frame['folded'] == ['SB']
+        # No showdown happened: the villain's cards stay hidden on the table.
+        assert 'revealed_cards' not in frame
 
 
 class TestReconstruction:

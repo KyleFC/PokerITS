@@ -44,6 +44,22 @@ describe('PokerTable', () => {
     expect(screen.getByText('Fold')).toBeInTheDocument();
   });
 
+  it('renders revealed villain cards face-up at showdown', () => {
+    const showdownFrame = {
+      ...frame,
+      kind: 'showdown',
+      narration: 'Showdown — BTN shows Kc Kh.',
+      revealed_cards: { BTN: ['Kc', 'Kh'] },
+    };
+    const { container } = render(
+      <PokerTable frame={showdownFrame} seats={['BB', 'BTN']} hero="BB" />
+    );
+    // Both revealed kings appear as face-up rank text, and the villain shows
+    // no Fold badge — they lost at showdown, they didn't fold.
+    expect(container.textContent).toContain('K');
+    expect(screen.queryByText('Fold')).not.toBeInTheDocument();
+  });
+
   it('places the dealer button on the button seat', () => {
     render(<PokerTable frame={frame} seats={['BB', 'BTN']} hero="BB" button="BTN" />);
     expect(screen.getByText('D')).toBeInTheDocument();

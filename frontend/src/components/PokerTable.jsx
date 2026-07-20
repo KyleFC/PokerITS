@@ -47,6 +47,9 @@ const SeatPod = ({ seat, frame, isHero, isButton }) => {
   const badge = folded ? 'Fold' : frame.seat_actions?.[seat];
   const stack = frame.stacks_bb?.[seat];
   const heroCards = frame.hero_cards || [];
+  // At showdown the frame exposes the villain's now-public hand; render it
+  // face-up instead of card backs.
+  const revealed = frame.revealed_cards?.[seat];
 
   return (
     <div className={`flex flex-col items-center gap-1 w-max ${folded ? 'opacity-40' : ''}`}>
@@ -54,12 +57,14 @@ const SeatPod = ({ seat, frame, isHero, isButton }) => {
       <div className="flex gap-0.5 -mb-6 z-0">
         {isHero
           ? heroCards.map((c, i) => <PokerCard key={i} value={c} />)
-          : !folded && (
-              <>
-                <PokerCard value="??" />
-                <PokerCard value="??" />
-              </>
-            )}
+          : revealed
+            ? revealed.map((c, i) => <PokerCard key={i} value={c} />)
+            : !folded && (
+                <>
+                  <PokerCard value="??" />
+                  <PokerCard value="??" />
+                </>
+              )}
       </div>
 
       {/* Action badge */}
