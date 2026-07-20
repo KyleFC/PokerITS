@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Clock, GraduationCap, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, GraduationCap, Target } from 'lucide-react';
 import { LESSONS, LESSON_BY_SLUG } from '../../lessons/meta';
 import { SKILL_LABELS } from '../../constants';
 
@@ -53,16 +53,13 @@ const LessonLayout = ({ lesson, children }) => {
             </div>
             <div className="flex-1 min-w-[220px]">
               <h1 className="text-3xl md:text-4xl font-bold text-white">{lesson.title}</h1>
-              <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <span className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" /> ~{lesson.minutes} min
-                </span>
-                {lesson.skill && (
+              {lesson.skill && (
+                <div className="flex items-center gap-3 mt-3 flex-wrap">
                   <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/15">
                     Graded skill: {SKILL_LABELS[lesson.skill]}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 

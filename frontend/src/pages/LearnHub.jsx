@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, BookOpen, Clock, ArrowRight, Target } from 'lucide-react';
+import { GraduationCap, BookOpen, ArrowRight, Target } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { studentService } from '../services/api';
 import { LESSONS } from '../lessons/meta';
@@ -88,9 +88,6 @@ const LearnHub = ({ user, onLogout }) => {
                       <Icon className="h-4 w-4 text-indigo-400 shrink-0" />
                       {lesson.title}
                     </Link>
-                    <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> ~{lesson.minutes} min
-                    </span>
                     {lesson.skill && (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/15 px-2 py-0.5 rounded-md">
                         {SKILL_LABELS[lesson.skill]}

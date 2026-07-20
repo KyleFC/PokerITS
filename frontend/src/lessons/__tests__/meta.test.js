@@ -53,7 +53,6 @@ describe('lessons/meta — curriculum integrity', () => {
       expect(lesson.shortTitle, lesson.slug).toBeTruthy();
       expect(lesson.summary, lesson.slug).toBeTruthy();
       expect(lesson.icon, lesson.slug).toBeTruthy();
-      expect(lesson.minutes, lesson.slug).toBeGreaterThan(0);
     }
   });
 });

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, XCircle, RefreshCw, BarChart2, BookOpen, Infinity as InfinityIcon, ArrowRight, Swords, Grid3x3, LineChart, GraduationCap } from 'lucide-react';
-import { studentService, pokerService } from '../services/api';
+import { Trophy, XCircle, RefreshCw, BarChart2, Infinity as InfinityIcon, ArrowRight, Swords, Grid3x3, LineChart, GraduationCap } from 'lucide-react';
+import { studentService } from '../services/api';
 import { SKILL_LABELS, BKT_PARAMS_BY_SKILL, isMastered } from '../constants';
 import PageLayout from '../components/PageLayout';
 import SkillCard from '../components/SkillCard';
-import ScenarioCard from '../components/ScenarioCard';
-import HandReplayModal from '../components/HandReplayModal';
 
 // The primary navigation targets, rendered as a compact grid. One accent color
 // (indigo) is used throughout; the per-card icon is the only visual differentiator.
@@ -45,20 +43,13 @@ const NAV_CARDS = [
 
 const Dashboard = ({ user, onLogout }) => {
   const [profile, setProfile] = useState(null);
-  const [scenarios, setScenarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeScenario, setActiveScenario] = useState(null);
   const [showBKTDetails, setShowBKTDetails] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
-      const [profileData, scenariosData] = await Promise.all([
-        studentService.getProfile(),
-        pokerService.getScenarios(),
-      ]);
-      setProfile(profileData);
-      setScenarios(scenariosData);
+      setProfile(await studentService.getProfile());
     } catch (err) {
       setError('Failed to fetch dashboard data. Please try again.');
     } finally {
@@ -69,12 +60,6 @@ const Dashboard = ({ user, onLogout }) => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
-  const handleQuizCompleted = () => {
-    setActiveScenario(null);
-    setLoading(true);
-    fetchDashboardData();
-  };
 
   if (loading) {
     return (
@@ -101,7 +86,7 @@ const Dashboard = ({ user, onLogout }) => {
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Welcome back, {user?.username}</h2>
           <p className="text-slate-400 mt-2 text-sm md:text-base max-w-xl leading-relaxed">
-            Poker ITS tracks your performance across core theoretical metrics. Practice with the diagnostic quiz bank below.
+            Poker ITS tracks your performance across core theoretical metrics. Pick up where you left off below.
           </p>
         </div>
         <div className="flex gap-4">
@@ -163,7 +148,7 @@ const Dashboard = ({ user, onLogout }) => {
       </section>
 
       {/* Primary navigation */}
-      <section className="mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {NAV_CARDS.map(({ to, icon: Icon, title, blurb }) => (
           <Link
             key={to}
@@ -186,32 +171,6 @@ const Dashboard = ({ user, onLogout }) => {
         ))}
       </section>
 
-      {/* Scenario Diagnostic Bank */}
-      <section>
-        <div className="flex items-center gap-2 mb-6">
-          <BookOpen className="h-5 w-5 text-indigo-400" />
-          <h3 className="text-xl font-bold text-slate-100">Diagnostic Quiz Bank</h3>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {scenarios.map((scenario) => (
-            <ScenarioCard
-              key={scenario.id}
-              scenario={scenario}
-              onStart={setActiveScenario}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Gameplay replay + quiz overlay (falls back to the static quiz for
-          scenarios that have no scripted hand). */}
-      {activeScenario && (
-        <HandReplayModal
-          scenario={activeScenario}
-          onClose={() => setActiveScenario(null)}
-          onCompleted={handleQuizCompleted}
-        />
-      )}
     </PageLayout>
   );
 };

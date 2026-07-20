@@ -18,7 +18,6 @@ export const LESSONS = [
     shortTitle: 'EV & Decision Quality',
     skill: null,
     icon: Scale,
-    minutes: 12,
     prereqs: [],
     summary:
       'Why this tutor grades your decisions instead of your results, the expected-value math behind every grade, and how to stop variance from lying to you.',
@@ -36,7 +35,6 @@ export const LESSONS = [
     shortTitle: 'Preflop Ranges',
     skill: 'preflop_range',
     icon: Grid3x3,
-    minutes: 15,
     prereqs: ['ev-and-decision-quality'],
     summary:
       'The 169-hand grid, why position sets how wide you open, raise-or-fold discipline, and the boundary hands where the real learning happens.',
@@ -54,7 +52,6 @@ export const LESSONS = [
     shortTitle: 'Counting Outs',
     skill: null,
     icon: Layers,
-    minutes: 10,
     prereqs: ['ev-and-decision-quality'],
     summary:
       'What an out is, the standard draw catalogue, and the double-counting trap in combo draws — the raw material every equity estimate is built from.',
@@ -71,7 +68,6 @@ export const LESSONS = [
     shortTitle: 'Equity Estimation',
     skill: 'equity_estimation',
     icon: Percent,
-    minutes: 12,
     prereqs: ['counting-outs'],
     summary:
       'Turn an out count into a win probability at the table: exact math, the rule of 2 and 4, and where the shortcut bends.',
@@ -89,7 +85,6 @@ export const LESSONS = [
     shortTitle: 'Pot Odds',
     skill: 'pot_odds',
     icon: Divide,
-    minutes: 12,
     prereqs: ['equity-estimation'],
     summary:
       'The price of a call: required break-even equity, the ladder of common bet sizes, and the three classic mistakes almost everyone makes.',
@@ -106,7 +101,6 @@ export const LESSONS = [
     shortTitle: 'Implied Odds',
     skill: 'implied_odds',
     icon: Coins,
-    minutes: 10,
     prereqs: ['pot-odds'],
     summary:
       'When future winnings justify a call the direct price never could — set-mining math, the 15-20x rule, and reverse implied odds.',
@@ -123,7 +117,6 @@ export const LESSONS = [
     shortTitle: 'Bet Sizing & Alpha',
     skill: null,
     icon: Crosshair,
-    minutes: 10,
     prereqs: ['pot-odds'],
     summary:
       'What a bet size offers the bettor and demands of the defender: alpha, the bluff break-even, and the standard sizing families.',
@@ -141,7 +134,6 @@ export const LESSONS = [
     shortTitle: 'MDF',
     skill: 'mdf',
     icon: ShieldCheck,
-    minutes: 12,
     prereqs: ['bet-sizing-and-alpha'],
     summary:
       'How often your range must continue against a bet so bluffs can never auto-profit — and why MDF is the mirror image of pot odds, not the same thing.',
