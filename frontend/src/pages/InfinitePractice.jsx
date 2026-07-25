@@ -8,6 +8,7 @@ import { LESSON_BY_SKILL } from '../lessons/meta';
 import PageLayout from '../components/PageLayout';
 import PokerCard from '../components/PokerCard';
 import QuizResultPanel from '../components/QuizResultPanel';
+import ScratchPad from '../components/ScratchPad';
 
 // Adaptive mode + one entry per generatable skill.
 const SKILL_TABS = [
@@ -262,6 +263,10 @@ const InfinitePractice = ({ user, onLogout }) => {
             <div className="text-slate-200 leading-relaxed text-sm md:text-base border-l-2 border-indigo-500 pl-4 py-1">
               {scenario.description}
             </div>
+
+            {/* Arithmetic aid, collapsed by default. Sits above the options so
+                it is reachable while deciding rather than only after grading. */}
+            <ScratchPad />
 
             {/* Options — sentence-length answers (e.g. implied odds) read
                 better stacked full-width; short ones stay in a 2-col grid. */}

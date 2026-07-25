@@ -49,6 +49,21 @@ class TestQuizResultGrading:
         assert obs.first().reference_id == 'preflop_01'
         assert obs.first().source == 'quiz'
 
+    def test_generated_pot_odds_result_carries_the_worked_breakdown(self):
+        scenario = generators.generate('pot_odds', 11)
+        response = self.client.post(
+            self.url, {'scenario_id': scenario['id'], 'answer': 'definitely wrong'}
+        )
+        assert response.data['correct'] is False
+        # The steps only reach the client once the answer has been graded.
+        assert response.data['breakdown'] == scenario['breakdown']
+
+    def test_scenarios_without_a_breakdown_return_none(self):
+        # Static-bank scenarios supply no worked steps; the client renders the
+        # explanation alone rather than erroring.
+        response = self.client.post(self.url, {'scenario_id': 'preflop_01', 'answer': 'Fold'})
+        assert response.data['breakdown'] is None
+
     def test_unknown_scenario_returns_404(self):
         response = self.client.post(self.url, {'scenario_id': 'does_not_exist', 'answer': 'Fold'})
         assert response.status_code == status.HTTP_404_NOT_FOUND

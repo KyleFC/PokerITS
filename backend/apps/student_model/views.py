@@ -73,6 +73,10 @@ class QuizResultView(APIView):
                 'correct_answer': scenario.get('correct_answer'),
                 'explanation': scenario.get('explanation'),
                 'ev_notes': scenario.get('ev_notes'),
+                # Optional worked steps behind the answer. Only some generators
+                # supply it (static bank scenarios never do), so absence is
+                # normal and the client renders it only when present.
+                'breakdown': scenario.get('breakdown'),
                 'skill': skill,
                 'profile': StudentProfileSerializer(profile).data,
             },

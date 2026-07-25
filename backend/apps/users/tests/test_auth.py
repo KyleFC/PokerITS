@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIClient
+from apps.student_model.models import DEFAULT_SKILLS
 
 User = get_user_model()
 
@@ -26,10 +27,15 @@ class TestAuthentication:
         assert response.status_code == status.HTTP_201_CREATED
         assert User.objects.filter(username='testplayer').exists()
         
-        # Verify student profile was created automatically via signal
+        # Verify student profile was created automatically via signal, seeded
+        # with every skill at its BKT prior. Compared against DEFAULT_SKILLS
+        # rather than literal values: the priors are re-tuned as the model is
+        # calibrated, and a hard-coded copy here would just drift out of sync
+        # with the engine (which is why DEFAULT_SKILLS derives them from
+        # DEFAULT_PARAMS in the first place).
         user = User.objects.get(username='testplayer')
         assert hasattr(user, 'student_profile')
-        assert user.student_profile.skills['preflop_range'] == 0.30
+        assert user.student_profile.skills == DEFAULT_SKILLS
 
     def test_registration_rejects_weak_password(self):
         payload = {

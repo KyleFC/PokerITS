@@ -152,6 +152,43 @@ class TestAnswerCorrectness:
                 assert s['correct_answer'] == 'Fold', (seed, klass)
 
 
+class TestPotOddsBreakdown:
+    """The worked steps shown after a missed question must agree with the graded
+    answer. A breakdown that drifts from the answer key would teach the wrong
+    arithmetic at exactly the moment the student is most likely to trust it."""
+
+    def test_every_step_is_well_formed(self):
+        steps = generators.generate('pot_odds', 7)['breakdown']
+        assert len(steps) == 5
+        for step in steps:
+            assert set(step) == {'label', 'formula', 'value'}
+            assert all(isinstance(v, str) and v for v in step.values())
+
+    def test_final_step_equals_the_correct_answer(self):
+        for seed in range(300):
+            s = generators.generate('pot_odds', seed)
+            assert s['breakdown'][-1]['value'] == s['correct_answer'], seed
+
+    def test_ratio_and_pot_steps_match_the_displayed_numbers(self):
+        for seed in range(300):
+            s = generators.generate('pot_odds', seed)
+            P, B = _bet_from(s)
+            values = {step['label']: step['value'] for step in s['breakdown']}
+            assert values['What the call costs you'] == f'{generators._fmt(B)} BB'
+            assert values['What you stand to win'] == f'{generators._fmt(P + B)} BB'
+            assert values['Pot size once you call'] == f'{generators._fmt(P + 2 * B)} BB'
+            expected_ratio = generators._fmt(round((P + B) / B, 1))
+            assert values['Pot odds being offered'] == f'{expected_ratio} : 1', seed
+
+    def test_breakdown_is_not_exposed_before_grading(self):
+        # Same rule as correct_answer/explanation: the public serializer must
+        # not hand the worked answer to the client with the question.
+        from apps.poker_engine.serializers import PublicScenarioSerializer
+
+        data = PublicScenarioSerializer(generators.generate('pot_odds', 3)).data
+        assert 'breakdown' not in data
+
+
 class TestEquityOutsBruteForce:
     """The stated out count is the ground truth for every equity answer, so
     verify it independently: enumerate all 47 unseen cards and count the ones

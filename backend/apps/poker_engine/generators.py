@@ -253,6 +253,39 @@ def generate_pot_odds(seed: int) -> dict:
             f"Required equity = risk / (risk + reward) = {_fmt(B)} / "
             f"({_fmt(P + B)} + {_fmt(B)}) = {correct_pct}%."
         ),
+        # The same arithmetic as the explanation, but split into the individual
+        # steps a student would write out by hand. Kept structured rather than
+        # prose so the client can render it as a worked example on a missed
+        # question; the explanation paragraph alone was reported as hard to
+        # follow when the answer was wrong. Only the grading response carries
+        # this — PublicScenarioSerializer never emits it.
+        'breakdown': [
+            {
+                'label': 'What the call costs you',
+                'formula': 'call = the bet you are facing',
+                'value': f"{_fmt(B)} BB",
+            },
+            {
+                'label': 'What you stand to win',
+                'formula': f"pot before your call = {_fmt(P)} + {_fmt(B)}",
+                'value': f"{_fmt(P + B)} BB",
+            },
+            {
+                'label': 'Pot odds being offered',
+                'formula': f"reward : risk = {_fmt(P + B)} : {_fmt(B)}",
+                'value': f"{_fmt(round((P + B) / B, 1))} : 1",
+            },
+            {
+                'label': 'Pot size once you call',
+                'formula': f"{_fmt(P)} pre-bet + {_fmt(B)} bet + {_fmt(B)} your call",
+                'value': f"{_fmt(total_after_call)} BB",
+            },
+            {
+                'label': 'Break-even equity',
+                'formula': f"call / pot after your call = {_fmt(B)} / {_fmt(total_after_call)}",
+                'value': f"{correct_pct}%",
+            },
+        ],
         'question_type': 'concept',
     }
 
