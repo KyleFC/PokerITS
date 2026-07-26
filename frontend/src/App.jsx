@@ -14,6 +14,21 @@ import Analytics from './pages/Analytics';
 import RangeCharts from './pages/RangeCharts';
 import LearnHub from './pages/LearnHub';
 import LearnLesson from './pages/LearnLesson';
+import AdminOverview from './pages/admin/AdminOverview';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminUserDetail from './pages/admin/AdminUserDetail';
+import AdminItems from './pages/admin/AdminItems';
+import AdminCurves from './pages/admin/AdminCurves';
+import AdminHealth from './pages/admin/AdminHealth';
+
+const ADMIN_ROUTES = [
+  { path: '/admin', element: AdminOverview },
+  { path: '/admin/users', element: AdminUsers },
+  { path: '/admin/users/:userId', element: AdminUserDetail },
+  { path: '/admin/items', element: AdminItems },
+  { path: '/admin/curves', element: AdminCurves },
+  { path: '/admin/health', element: AdminHealth },
+];
 
 export default function App() {
   const [auth, setAuth] = useState(authService.isAuthenticated());
@@ -104,6 +119,26 @@ export default function App() {
           path="/learn/:slug"
           element={auth ? <LearnLesson user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
         />
+        {/* Instructor console. `user.is_staff` comes from /auth/me/, so this
+            guard only decides what to render — the admin API re-checks the flag
+            on every request and 403s a non-staff caller regardless. Non-staff
+            users are bounced to the student dashboard rather than /login, since
+            they are legitimately signed in, just not authorized. */}
+        {ADMIN_ROUTES.map(({ path, element: Element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              !auth ? (
+                <Navigate to="/login" replace />
+              ) : user?.is_staff ? (
+                <Element user={user} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+        ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

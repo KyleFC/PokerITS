@@ -16,4 +16,7 @@ urlpatterns = [
     path('api/auth/', include('apps.users.urls')),
     path('api/student/', include('apps.student_model.urls')),
     path('api/poker/', include('apps.poker_engine.urls')),
+    # Instructor/researcher dashboard. Every view inside is gated on
+    # User.is_staff (apps.admin_analytics.permissions.IsStaffUser).
+    path('api/admin/', include('apps.admin_analytics.urls')),
 ]

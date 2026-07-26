@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.student_model',
     'apps.poker_engine',
     'apps.llm_tutor',
+    'apps.admin_analytics',
 ]
 
 MIDDLEWARE = [

@@ -252,4 +252,71 @@ export const exploitService = {
   },
 };
 
+// Instructor/researcher dashboard (staff only). Every endpoint here is gated on
+// User.is_staff server-side; the SPA hiding the route is convenience, not
+// security, so a non-staff caller gets a 403 rather than data.
+export const adminService = {
+  // Cohort KPIs, per-skill mastery distributions, and the daily activity
+  // timeline for the last `days` days.
+  getOverview: async (days = 30) => {
+    const response = await api.get(`/admin/overview/?days=${days}`);
+    return response.data;
+  },
+
+  // Student roster with per-user rollups. Params: { q, sort, order, page,
+  // page_size, include_staff }. Returns { count, page, page_size, results }.
+  getUsers: async (params = {}) => {
+    const qs = new URLSearchParams(
+      Object.entries(params).filter(([, v]) => v !== '' && v != null)
+    ).toString();
+    const response = await api.get(`/admin/users/${qs ? `?${qs}` : ''}`);
+    return response.data;
+  },
+
+  // Full drill-down for one student. `observations` and `hand_stats` come back
+  // in the same shapes the student's own Analytics / Arena Stats pages use, so
+  // the admin UI reuses those chart components unchanged.
+  getUser: async (userId) => {
+    const response = await api.get(`/admin/users/${userId}/`);
+    return response.data;
+  },
+
+  // Item analysis: p-value and discrimination per quiz item, plus the authored
+  // bank items nobody has attempted yet.
+  getItems: async (minAttempts = 1) => {
+    const response = await api.get(`/admin/items/?min_attempts=${minAttempts}`);
+    return response.data;
+  },
+
+  // Cohort accuracy vs. attempt number, per skill.
+  getCurves: async (maxOpportunity = 25) => {
+    const response = await api.get(`/admin/curves/?max_opportunity=${maxOpportunity}`);
+    return response.data;
+  },
+
+  // Abandoned sessions, row counts, and data-integrity checks.
+  getHealth: async (staleHours = 24) => {
+    const response = await api.get(`/admin/health/?stale_hours=${staleHours}`);
+    return response.data;
+  },
+
+  // CSV export. Fetched as a blob and saved client-side rather than linked
+  // directly, because the endpoint needs the JWT Authorization header that a
+  // plain <a href> download can't send.
+  downloadExport: async (dataset = 'observations') => {
+    const response = await api.get(`/admin/export/?dataset=${dataset}`, {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
+    const link = document.createElement('a');
+    link.href = url;
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    link.download = `poker_its_${dataset}_${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  },
+};
+
 export default api;

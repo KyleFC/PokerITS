@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, BrainCircuit } from 'lucide-react';
+import { LogOut, BrainCircuit, ShieldCheck } from 'lucide-react';
 
 // App shell: sticky header with branding + user chip, main content slot, footer.
 const PageLayout = ({ children, onLogout, user }) => {
@@ -28,6 +28,17 @@ const PageLayout = ({ children, onLogout, user }) => {
             <Link to="/analytics" className="text-sm font-medium text-slate-300 hover:text-white transition">Analytics</Link>
             {/* Tutorial moved under the Learning Center (hub "Fundamentals" card). */}
             <Link to="/ranges" className="text-sm font-medium text-slate-300 hover:text-white transition">Ranges</Link>
+            {/* Staff-only link into the instructor console. Hiding it is a UI
+                courtesy; the admin API enforces is_staff on every request. */}
+            {user?.is_staff && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-amber-400 hover:text-amber-300 transition flex items-center gap-1"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {user && (
               <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
                 <div className="flex items-center gap-2">
