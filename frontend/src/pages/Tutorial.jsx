@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, BookOpen, Zap, Users, DollarSign, Award } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
+import PokerCard from '../components/PokerCard';
 
 const Tutorial = ({ user, onLogout }) => {
   const [activeSection, setActiveSection] = useState('intro');
@@ -211,16 +212,16 @@ const HandRankingsContent = () => (
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {[
-        { rank: 1, name: 'Royal Flush', desc: 'A-K-Q-J-10 same suit', example: 'A♥ K♥ Q♥ J♥ 10♥' },
-        { rank: 2, name: 'Straight Flush', desc: '5 cards in sequence, same suit', example: '9♠ 8♠ 7♠ 6♠ 5♠' },
-        { rank: 3, name: 'Four of a Kind', desc: 'Four cards same rank', example: 'K♥ K♦ K♠ K♣ Q♥' },
-        { rank: 4, name: 'Full House', desc: 'Three of a kind + pair', example: 'Q♥ Q♦ Q♠ 7♣ 7♥' },
-        { rank: 5, name: 'Flush', desc: '5 cards same suit', example: 'K♣ J♣ 9♣ 5♣ 3♣' },
-        { rank: 6, name: 'Straight', desc: '5 cards in sequence', example: '10♥ 9♦ 8♠ 7♣ 6♥' },
-        { rank: 7, name: 'Three of a Kind', desc: 'Three cards same rank', example: '8♥ 8♦ 8♠ K♣ J♥' },
-        { rank: 8, name: 'Two Pair', desc: 'Two pairs of cards', example: 'J♥ J♦ 5♠ 5♣ 2♥' },
-        { rank: 9, name: 'One Pair', desc: 'Two cards same rank', example: '4♥ 4♦ A♠ K♣ Q♥' },
-        { rank: 10, name: 'High Card', desc: 'No combination', example: 'K♥ J♦ 9♠ 6♣ 3♥' },
+        { rank: 1, name: 'Royal Flush', desc: 'A-K-Q-J-10 same suit', example: ['Ah', 'Kh', 'Qh', 'Jh', 'Th'] },
+        { rank: 2, name: 'Straight Flush', desc: '5 cards in sequence, same suit', example: ['9s', '8s', '7s', '6s', '5s'] },
+        { rank: 3, name: 'Four of a Kind', desc: 'Four cards same rank', example: ['Kh', 'Kd', 'Ks', 'Kc', 'Qh'] },
+        { rank: 4, name: 'Full House', desc: 'Three of a kind + pair', example: ['Qh', 'Qd', 'Qs', '7c', '7h'] },
+        { rank: 5, name: 'Flush', desc: '5 cards same suit', example: ['Kc', 'Jc', '9c', '5c', '3c'] },
+        { rank: 6, name: 'Straight', desc: '5 cards in sequence', example: ['Th', '9d', '8s', '7c', '6h'] },
+        { rank: 7, name: 'Three of a Kind', desc: 'Three cards same rank', example: ['8h', '8d', '8s', 'Kc', 'Jh'] },
+        { rank: 8, name: 'Two Pair', desc: 'Two pairs of cards', example: ['Jh', 'Jd', '5s', '5c', '2h'] },
+        { rank: 9, name: 'One Pair', desc: 'Two cards same rank', example: ['4h', '4d', 'As', 'Kc', 'Qh'] },
+        { rank: 10, name: 'High Card', desc: 'No combination', example: ['Kh', 'Jd', '9s', '6c', '3h'] },
       ].map(({ rank, name, desc, example }) => (
         <div key={rank} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 flex items-start gap-3">
           <span className="w-7 h-7 shrink-0 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 tabular-nums">
@@ -229,7 +230,11 @@ const HandRankingsContent = () => (
           <div>
             <h4 className="font-bold text-slate-100 mb-1">{name}</h4>
             <p className="text-sm text-slate-400 mb-2">{desc}</p>
-            <p className="font-mono text-sm text-slate-300">{example}</p>
+            <div className="flex gap-1">
+              {example.map((card) => (
+                <PokerCard key={card} value={card} size="sm" />
+              ))}
+            </div>
           </div>
         </div>
       ))}
