@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, XCircle, RefreshCw, BarChart2, Infinity as InfinityIcon, ArrowRight, Swords, Grid3x3, LineChart, GraduationCap } from 'lucide-react';
 import { studentService } from '../services/api';
-import { SKILL_LABELS, BKT_PARAMS_BY_SKILL, isMastered } from '../constants';
+import { SKILL_LABELS, BKT_PARAMS_BY_SKILL, isMastered, attemptsForSkill } from '../constants';
 import PageLayout from '../components/PageLayout';
 import SkillCard from '../components/SkillCard';
 
@@ -46,6 +46,12 @@ const Dashboard = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showBKTDetails, setShowBKTDetails] = useState(false);
+
+  // `user.is_staff` comes from /auth/me/ and is read-only there. A non-staff
+  // account can never reach the detail view even if the flag is forged locally
+  // in a way that flips this — there is nothing behind it to fetch.
+  const showBktInternals = !!user?.is_staff;
+  const detailed = showBKTDetails && showBktInternals;
 
   const fetchDashboardData = async () => {
     try {
@@ -114,34 +120,41 @@ const Dashboard = ({ user, onLogout }) => {
             <BarChart2 className="h-5 w-5 text-indigo-400" />
             <h3 className="text-xl font-bold text-slate-100">BKT Skill Mastery Profiles</h3>
           </div>
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Show Details
-            </label>
-            <button
-              onClick={() => setShowBKTDetails(!showBKTDetails)}
-              className={`relative inline-flex h-6 w-11 rounded-full transition ${
-                showBKTDetails ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
-                  showBKTDetails ? 'translate-x-6' : 'translate-x-0.5'
+          {/* Raw BKT component values (slip/guess/transition) are instructor
+              tooling — for a student they read as unexplained jargon next to
+              their own score. Staff-only, following the same UI-courtesy gate
+              as the admin console; the params themselves ship in the client
+              bundle, so this is about clarity, not secrecy. */}
+          {showBktInternals && (
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Show Details
+              </label>
+              <button
+                onClick={() => setShowBKTDetails(!showBKTDetails)}
+                className={`relative inline-flex h-6 w-11 rounded-full transition ${
+                  showBKTDetails ? 'bg-indigo-600' : 'bg-slate-700'
                 }`}
-                style={{ marginTop: '2px' }}
-              />
-            </button>
-          </div>
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+                    showBKTDetails ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                  style={{ marginTop: '2px' }}
+                />
+              </button>
+            </div>
+          )}
         </div>
-        <div className={`grid gap-6 ${showBKTDetails ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-5'}`}>
+        <div className={`grid gap-6 ${detailed ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-5'}`}>
           {profile && Object.entries(profile.skills).map(([skillName, value]) => (
             <SkillCard
               key={skillName}
               label={SKILL_LABELS[skillName] || skillName}
               value={value}
-              observationCount={profile.skill_observations?.[skillName]}
+              observationCount={attemptsForSkill(profile, skillName)}
               params={BKT_PARAMS_BY_SKILL[skillName]}
-              showDetails={showBKTDetails}
+              showDetails={detailed}
             />
           ))}
         </div>

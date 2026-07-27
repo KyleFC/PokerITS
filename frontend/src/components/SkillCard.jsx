@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import { isMastered as isMasteredGate } from '../constants';
+import { isMastered as isMasteredGate, MASTERY_MIN_OBSERVATIONS } from '../constants';
 
 // Fallback BKT params for the detail view when a per-skill set isn't supplied.
 const DEFAULT_BKT_PARAMS = { p_l0: 0.30, p_t: 0.06, p_g: 0.40, p_s: 0.10 };
@@ -13,6 +13,19 @@ const SkillCard = ({ label, value, observationCount, params, showDetails = false
   const bkt = params || DEFAULT_BKT_PARAMS;
   const isMastered = isMasteredGate(masteryValue, observationCount);
   const percentage = Math.round(masteryValue * 100);
+
+  // A brand-new account's number is the BKT prior P(L0) — the model's starting
+  // assumption before it has seen a single answer. Drawing that as a filled
+  // "Progress" bar reads as progress the student never made; a tester assumed
+  // another user's data had leaked into their account. So an explicit zero
+  // count gets its own state: empty bar, muted number, and a caption saying
+  // what the number actually is.
+  //
+  // Only an explicit 0 means "never attempted". null/undefined means the caller
+  // supplied no counts at all, which stays on the old rendering — the same
+  // graceful-degradation convention isMastered() documents.
+  const noEvidence = observationCount === 0;
+  const lowEvidence = observationCount > 0 && observationCount < MASTERY_MIN_OBSERVATIONS;
 
   if (showDetails) {
     return (
@@ -98,7 +111,11 @@ const SkillCard = ({ label, value, observationCount, params, showDetails = false
           <h3 className="font-semibold text-lg text-slate-100 group-hover:text-indigo-400 transition">{label}</h3>
           <span className="text-xs text-slate-400 mt-1 block">BKT Mastery Estimate</span>
         </div>
-        {isMastered ? (
+        {noEvidence ? (
+          <span className="bg-slate-800/80 text-slate-400 text-xs px-2.5 py-1 rounded-full border border-slate-700 font-semibold shadow-sm">
+            Not started
+          </span>
+        ) : isMastered ? (
           <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/20 font-semibold flex items-center gap-1.5 shadow-sm">
             <Check className="h-3 w-3" /> Mastered
           </span>
@@ -111,15 +128,34 @@ const SkillCard = ({ label, value, observationCount, params, showDetails = false
 
       <div className="mt-2">
         <div className="flex justify-between items-end mb-1.5 text-xs font-semibold">
-          <span className="text-slate-400">Progress</span>
-          <span className="text-indigo-400">{percentage}%</span>
+          <span className="text-slate-400">{noEvidence ? 'Starting estimate' : 'Progress'}</span>
+          <span className={noEvidence ? 'text-slate-500' : 'text-indigo-400'}>{percentage}%</span>
         </div>
         <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${isMastered ? 'bg-emerald-500' : 'bg-indigo-500'}`}
-            style={{ width: `${percentage}%` }}
-          />
+          {/* The bar tracks evidence, so it stays empty until an answer exists —
+              the prior belongs to the model, not to the student's progress. */}
+          {!noEvidence && (
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${isMastered ? 'bg-emerald-500' : 'bg-indigo-500'}`}
+              style={{ width: `${percentage}%` }}
+            />
+          )}
         </div>
+        {noEvidence && (
+          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+            No answers yet — this is where the tutor assumes everyone starts, not progress you have made.
+          </p>
+        )}
+        {lowEvidence && (
+          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+            Based on {observationCount} answer{observationCount === 1 ? '' : 's'} — still a rough estimate.
+          </p>
+        )}
+        {observationCount >= MASTERY_MIN_OBSERVATIONS && (
+          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+            Based on {observationCount} answers.
+          </p>
+        )}
       </div>
     </div>
   );

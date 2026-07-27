@@ -49,6 +49,17 @@ describe('LearnHub', () => {
     expect(screen.getByText('Mastery 96%')).toBeInTheDocument(); // preflop_range, mastered styling
   });
 
+  it('badges an unattempted skill as not started rather than quoting the BKT prior', async () => {
+    studentService.getProfile.mockResolvedValue({
+      skills: { pot_odds: 0.42, preflop_range: 0.35 },
+      skill_observations: { pot_odds: 6 }, // preflop_range has no answers yet
+    });
+    renderPage();
+    expect(await screen.findByText('Mastery 42%')).toBeInTheDocument();
+    expect(screen.getByText('Not started')).toBeInTheDocument();
+    expect(screen.queryByText('Mastery 35%')).not.toBeInTheDocument();
+  });
+
   it('still renders the full curriculum when the profile fetch fails', async () => {
     studentService.getProfile.mockRejectedValue(new Error('offline'));
     renderPage();

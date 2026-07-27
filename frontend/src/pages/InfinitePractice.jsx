@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Infinity as InfinityIcon, RefreshCw, XCircle, ArrowRight, Target, Zap, BookOpen } from 'lucide-react';
 import { pokerService, studentService } from '../services/api';
-import { SKILL_LABELS, GENERATABLE_SKILLS, isMastered } from '../constants';
+import { SKILL_LABELS, GENERATABLE_SKILLS, isMastered, attemptsForSkill } from '../constants';
 import { LESSON_BY_SKILL } from '../lessons/meta';
 import PageLayout from '../components/PageLayout';
 import PokerCard from '../components/PokerCard';
@@ -98,6 +98,9 @@ const InfinitePractice = ({ user, onLogout }) => {
   const accuracy = stats.answered ? Math.round((stats.correct / stats.answered) * 100) : 0;
   const activeSkill = scenario?.skill;
   const activeMastery = profile && activeSkill != null ? profile.skills?.[activeSkill] : null;
+  // 0 answers so far means the mastery number is still the untouched BKT prior.
+  const activeAttempts = attemptsForSkill(profile, activeSkill);
+  const notStarted = activeAttempts === 0;
 
   const optionButtonClass = (opt) => {
     const isSelected = selectedOption === opt;
@@ -200,16 +203,24 @@ const InfinitePractice = ({ user, onLogout }) => {
                 <div className="flex items-center gap-2 min-w-[180px]">
                   <span className="text-xs text-slate-500 font-semibold">Mastery</span>
                   <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        isMastered(activeMastery, profile?.skill_observations?.[activeSkill])
-                          ? 'bg-emerald-500' : 'bg-indigo-500'
-                      }`}
-                      style={{ width: `${Math.round(activeMastery * 100)}%` }}
-                    />
+                    {/* Empty until this skill has an answer behind it: before
+                        that the number is the BKT prior, not earned progress. */}
+                    {!notStarted && (
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isMastered(activeMastery, activeAttempts)
+                            ? 'bg-emerald-500' : 'bg-indigo-500'
+                        }`}
+                        style={{ width: `${Math.round(activeMastery * 100)}%` }}
+                      />
+                    )}
                   </div>
-                  <span className="text-xs font-bold text-slate-300 tabular-nums w-9 text-right">
-                    {Math.round(activeMastery * 100)}%
+                  <span
+                    className={`text-xs font-bold tabular-nums text-right ${
+                      notStarted ? 'text-slate-500' : 'text-slate-300 w-9'
+                    }`}
+                  >
+                    {notStarted ? 'Not started' : `${Math.round(activeMastery * 100)}%`}
                   </span>
                 </div>
               )}

@@ -4,7 +4,7 @@ import { GraduationCap, BookOpen, ArrowRight, Target } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { studentService } from '../services/api';
 import { LESSONS } from '../lessons/meta';
-import { SKILL_LABELS, isMastered } from '../constants';
+import { SKILL_LABELS, isMastered, attemptsForSkill } from '../constants';
 
 // The Learning Center hub: the ordered curriculum. Skill lessons show the
 // student's live BKT mastery next to their card (fetched once, degrades
@@ -68,6 +68,10 @@ const LearnHub = ({ user, onLogout }) => {
         {LESSONS.map((lesson, i) => {
           const Icon = lesson.icon;
           const mastery = lesson.skill && skills ? skills[lesson.skill] : null;
+          // 0 answers means the mastery number is still the untouched BKT
+          // prior, so badge it "Not started" rather than quoting a percentage
+          // the student has not earned. null = counts unavailable, render as before.
+          const attempts = attemptsForSkill(profile, lesson.skill);
           return (
             <div
               key={lesson.slug}
@@ -96,12 +100,14 @@ const LearnHub = ({ user, onLogout }) => {
                     {mastery != null && (
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
-                          isMastered(mastery, profile?.skill_observations?.[lesson.skill])
+                          isMastered(mastery, attempts)
                             ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
-                            : 'text-slate-300 bg-slate-800/80 border-slate-700'
+                            : attempts === 0
+                              ? 'text-slate-500 bg-slate-900/80 border-slate-800'
+                              : 'text-slate-300 bg-slate-800/80 border-slate-700'
                         }`}
                       >
-                        Mastery {Math.round(mastery * 100)}%
+                        {attempts === 0 ? 'Not started' : `Mastery ${Math.round(mastery * 100)}%`}
                       </span>
                     )}
                   </div>

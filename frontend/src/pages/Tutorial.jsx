@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, BookOpen, Zap, Users, DollarSign, Award } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import PokerCard from '../components/PokerCard';
+import TableSequence from '../components/tutorial/TableSequence';
+import ActionExplorer from '../components/tutorial/ActionExplorer';
+import {
+  SEATS,
+  HERO,
+  BUTTON,
+  DEAL_FRAMES,
+  FLOP_FRAMES,
+  TURN_FRAMES,
+  RIVER_FRAMES,
+} from '../components/tutorial/sequences';
 
 const Tutorial = ({ user, onLogout }) => {
   const [activeSection, setActiveSection] = useState('intro');
@@ -59,7 +70,7 @@ const Tutorial = ({ user, onLogout }) => {
 
         {/* Main Content */}
         <div className="lg:col-span-3">
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 md:p-10">
+          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 sm:p-8 md:p-10">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-indigo-600/20 rounded-lg">
@@ -145,33 +156,82 @@ const BasicsContent = () => (
   <>
     <h3 className="font-bold text-lg text-white">How a Hand Works</h3>
     <p>
-      Every poker hand follows the same structure. Two players start with private cards, and then community cards are revealed in stages.
+      Every poker hand follows the same structure. Each player starts with private cards, and then community cards are revealed in stages. The animations below play out one full hand — watch it, or step through it with the dots.
     </p>
 
     <div className="space-y-4">
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-5">
-        <h4 className="font-semibold text-indigo-300 mb-3">1. The Deal (Preflop)</h4>
-        <p className="text-sm mb-2">Each player receives 2 private cards (called "hole cards") that only they can see.</p>
-        <p className="text-xs text-slate-400">The first player after the big blind acts first. The action moves clockwise.</p>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 sm:p-5 space-y-4">
+        <div>
+          <h4 className="font-semibold text-indigo-300 mb-3">1. The Deal (Preflop)</h4>
+          <p className="text-sm mb-2">Each player receives 2 private cards (called "hole cards") that only they can see.</p>
+          <p className="text-xs text-slate-400">The first player after the big blind acts first. The action moves clockwise.</p>
+        </div>
+        <TableSequence
+          title="Watch: the deal"
+          seats={SEATS}
+          hero={HERO}
+          button={BUTTON}
+          frames={DEAL_FRAMES}
+        />
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-5">
-        <h4 className="font-semibold text-indigo-300 mb-3">2. The Flop</h4>
-        <p className="text-sm mb-2">Three community cards are revealed in the center of the table. Everyone can use these cards.</p>
-        <p className="text-xs text-slate-400">Players can now make a 5-card hand using their 2 cards + any 3 of the 5 community cards.</p>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 sm:p-5 space-y-4">
+        <div>
+          <h4 className="font-semibold text-indigo-300 mb-3">2. The Flop</h4>
+          <p className="text-sm mb-2">Three community cards are revealed in the center of the table. Everyone can use these cards.</p>
+          <p className="text-xs text-slate-400">Players can now make a 5-card hand using their 2 cards + any 3 of the 5 community cards.</p>
+        </div>
+        <TableSequence
+          title="Watch: the flop"
+          seats={SEATS}
+          hero={HERO}
+          button={BUTTON}
+          frames={FLOP_FRAMES}
+        />
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-5">
-        <h4 className="font-semibold text-indigo-300 mb-3">3. The Turn</h4>
-        <p className="text-sm mb-2">A fourth community card is revealed.</p>
-        <p className="text-xs text-slate-400">Now 6 cards are available to make the best 5-card hand.</p>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 sm:p-5 space-y-4">
+        <div>
+          <h4 className="font-semibold text-indigo-300 mb-3">3. The Turn</h4>
+          <p className="text-sm mb-2">A fourth community card is revealed.</p>
+          <p className="text-xs text-slate-400">Now 6 cards are available to make the best 5-card hand.</p>
+        </div>
+        <TableSequence
+          title="Watch: the turn"
+          seats={SEATS}
+          hero={HERO}
+          button={BUTTON}
+          frames={TURN_FRAMES}
+        />
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-5">
-        <h4 className="font-semibold text-indigo-300 mb-3">4. The River</h4>
-        <p className="text-sm mb-2">The fifth and final community card is revealed.</p>
-        <p className="text-xs text-slate-400">Now all 7 cards are visible. Players form their best 5-card hand.</p>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 sm:p-5 space-y-4">
+        <div>
+          <h4 className="font-semibold text-indigo-300 mb-3">4. The River</h4>
+          <p className="text-sm mb-2">The fifth and final community card is revealed.</p>
+          <p className="text-xs text-slate-400">Now all 7 cards are visible. Players form their best 5-card hand.</p>
+        </div>
+        <TableSequence
+          title="Watch: the river"
+          seats={SEATS}
+          hero={HERO}
+          button={BUTTON}
+          frames={RIVER_FRAMES}
+        />
       </div>
+    </div>
+
+    <h3 className="font-bold text-lg text-white mt-6">Your Turn: What Each Action Does</h3>
+    <p className="text-sm">
+      "The action moves clockwise" only tells you the order. What actually happens depends on which of five things you do when it reaches you. Pick one and watch it play out — including who acts next, and what it costs them.
+    </p>
+
+    <ActionExplorer />
+
+    <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-5">
+      <p className="text-sm">
+        <strong className="text-indigo-200">When does a betting round end?</strong> When everyone still in the hand has had a turn <em>and</em> everyone has put in the same amount. If a raise comes in behind you, the action keeps going around until that is true — then the next community card comes out and a new round starts.
+      </p>
     </div>
 
     <h3 className="font-bold text-lg text-white mt-6">Key Terminology</h3>

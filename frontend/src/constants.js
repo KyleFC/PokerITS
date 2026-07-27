@@ -39,6 +39,24 @@ export const isMastered = (mastery, observationCount) => {
   return observationCount >= MASTERY_MIN_OBSERVATIONS;
 };
 
+// How many answers back a skill's mastery estimate, from a profile payload.
+//
+// The distinction matters for display: until a skill has an observation, its
+// mastery number is still the BKT prior P(L0) — the tutor's starting assumption
+// about everyone, carrying no information about this student. Showing that as
+// earned progress led a tester to conclude another user's data had leaked into
+// their fresh account.
+//
+// `skill_observations` omits skills with no rows, so a present map with a
+// missing key means a genuine zero. A missing map means the caller has no count
+// data at all: returns null for "unknown", which callers render the old way
+// rather than mislabelling as not-started (same convention as isMastered).
+export const attemptsForSkill = (profile, skill) => {
+  const counts = profile?.skill_observations;
+  if (!counts || skill == null) return null;
+  return counts[skill] ?? 0;
+};
+
 // Below this posterior a skill is flagged for remediation on the analytics
 // timelines. 0.30 is the BKT starting prior P(L0) (bkt_engine.py): sitting
 // below where a brand-new student starts means the evidence is persistently

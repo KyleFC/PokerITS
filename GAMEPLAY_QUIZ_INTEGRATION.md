@@ -10,6 +10,11 @@
 
 This plan has been fully implemented against **PokerKit 0.7.4**. All backend and frontend gates pass: `pytest` = 98 passed / 6 skipped (skips are action-option checks correctly skipped on concept scenarios), `vitest` = 9 passed, `vite build` clean, and a live HTTP smoke test of the replay endpoint returns correct frames with no answer-key/gameplay leakage.
 
+> Test counts above are a snapshot from July 5, 2026, when this work landed. The suite has
+> grown considerably since — see `IMPLEMENTATION_STATUS.md` for current totals. The 6 skips
+> are still exactly these same intentional ones. `requirements.txt` now pins
+> `pokerkit>=0.7,<0.9`; the 0.7.4 API notes below still hold.
+
 **Files added/changed:**
 - Backend: `apps/poker_engine/replay.py` (new), `apps/poker_engine/views.py` (+`ScenarioReplayView`), `apps/poker_engine/urls.py` (+replay route, ordered before the catch-all), `apps/poker_engine/scenarios.json` (+`question_type`/`gameplay` on all 8), `apps/poker_engine/tests/test_replay.py` (new), `requirements.txt` (+`pokerkit`).
 - Frontend: `components/PokerTable.jsx` (new), `components/HandReplayModal.jsx` (new), `components/QuizResultPanel.jsx` (extracted, shared with `QuizModal`), `components/PokerCard.jsx` (+face-down back for `??`), `services/api.js` (+`getScenarioReplay`), `pages/Dashboard.jsx` (uses `HandReplayModal`), `components/__tests__/PokerTable.test.jsx` (new).
@@ -523,15 +528,17 @@ Gate (final): `pytest -v` fully green, `npm test` green, manual click-through pe
 
 ## 10. Ordered Task Checklist
 
-- [ ] B1 Add `pokerkit` to requirements, install, import-check
-- [ ] B2 Seat-order/API scratch verification (§5.1)
-- [ ] B3 `replay.py` with `build_replay` + `ReplayError`
-- [ ] B4 `ScenarioReplayView` + URL + leakage check
-- [ ] B5 Author `gameplay` + `question_type` for all 8 scenarios (worked examples §4.3/§4.4 first — they are pre-authored)
-- [ ] T1 `test_replay.py` (write alongside B5; run per scenario as authored)
-- [ ] F1 `pokerService.getScenarioReplay`
-- [ ] F2 `PokerTable.jsx`
-- [ ] F3 `HandReplayModal.jsx` + shared `QuizResultPanel.jsx` extraction
-- [ ] F4 Dashboard wiring + fallback to `QuizModal`
-- [ ] T2 Vitest `PokerTable` test
-- [ ] Final gate: full `pytest -v`, `npm test`, manual click-through of one action and one concept scenario
+All complete — see the status banner at the top of this document.
+
+- [x] B1 Add `pokerkit` to requirements, install, import-check
+- [x] B2 Seat-order/API scratch verification (§5.1)
+- [x] B3 `replay.py` with `build_replay` + `ReplayError`
+- [x] B4 `ScenarioReplayView` + URL + leakage check
+- [x] B5 Author `gameplay` + `question_type` for all 8 scenarios (worked examples §4.3/§4.4 first — they are pre-authored)
+- [x] T1 `test_replay.py` (write alongside B5; run per scenario as authored)
+- [x] F1 `pokerService.getScenarioReplay`
+- [x] F2 `PokerTable.jsx`
+- [x] F3 `HandReplayModal.jsx` + shared `QuizResultPanel.jsx` extraction
+- [x] F4 Dashboard wiring + fallback to `QuizModal`
+- [x] T2 Vitest `PokerTable` test
+- [x] Final gate: full `pytest -v`, `npm test`, manual click-through of one action and one concept scenario

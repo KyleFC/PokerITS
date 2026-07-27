@@ -47,43 +47,63 @@ player's action, so there is no need for a push-based transport.
 - **Hand evaluation:** `treys` or `eval7` (Python) — do not hand-roll poker hand evaluation
 - **LLM integration:** Anthropic API, isolated behind a service layer (see Module 5)
 - **Testing:** pytest (backend), Vitest or Jest (frontend)
+- **Production serving:** gunicorn (WSGI) + WhiteNoise for collected static files, so a
+  demo deployment needs no separate static host or CDN
 
 ## 4. File Structure
+
+Below is the structure **as built**, which extends the original plan with the Learning
+Center (Module 6), Exploit Lab (Module 7) and instructor console (Module 8). Two planned
+items were deliberately dropped: `hooks/useGameState.js` (pages own their own fetch/state;
+no shared hook earned its keep) and per-component directories (single `.jsx` files
+grouped by domain instead).
 
 ```
 poker-its/
 │
 ├── backend/
-│   ├── config/                     # Settings, routing, WSGI/ASGI config
-│   ├── requirements.txt            # or pyproject.toml
-│   ├── .env.example                # LLM API key, DB creds, etc. — never commit real .env
+│   ├── config/                     # Settings, routing, WSGI
+│   ├── requirements.txt
+│   ├── .env.example                # LLM API key, DB creds, STAFF_USERNAMES — never commit real .env
 │   ├── manage.py
 │   └── apps/
 │       ├── users/                  # Auth, base profile creation
+│       │   ├── management/commands/promote_staff.py   # grants is_staff — see Module 8
 │       │   └── tests/
 │       ├── student_model/          # BKT engine and student tracking state
 │       │   ├── models.py           # Current-state profile (JSONField) — see §5
-│       │   ├── observations.py     # models.py addition: append-only observation log — see §5
+│       │   ├── observations.py     # Append-only observation log — see §5
 │       │   ├── bkt_engine.py       # Pure Python BKT probability updates (no I/O, no ORM calls)
-│       │   ├── views.py            # API endpoints: fetch profile, submit quiz/hand result
+│       │   ├── services.py         # record_skill_observation() — the single mastery write path
+│       │   ├── views.py            # API endpoints: fetch profile, submit quiz result, history
 │       │   └── tests/
 │       │       └── test_bkt_engine.py   # Required: unit tests on known BKT inputs/outputs
 │       ├── poker_engine/           # Gameplay state, scenario bank, evaluation math
-│       │   ├── hand_eval.py        # Wraps treys/eval7; equity & hand-strength calculations
+│       │   ├── hand_eval.py        # Wraps treys; equity & hand-strength calculations
 │       │   ├── scenarios.json      # Static hardcoded scenarios (Milestone 1)
+│       │   ├── scenario_bank.py    # Single load path for static + generated scenarios
+│       │   ├── generators.py       # Procedural per-skill scenario generation (seeded)
+│       │   ├── replay.py           # Scripted-hand replay on PokerKit — see GAMEPLAY_QUIZ_INTEGRATION.md
 │       │   ├── preflop_charts.py   # Static precomputed GTO preflop range charts
+│       │   ├── preflop_mixed_charts.py
 │       │   ├── game_loop.py        # Synchronous heads-up dealer/state machine (Milestone 2)
 │       │   ├── bot_strategy.py     # Rule-based bot opponent (see §7 — NOT an LLM)
 │       │   ├── ev_eval.py          # EV-loss calc: preflop chart deviation + postflop math
-│       │   ├── models.py           # HandHistory model — see §6
+│       │   ├── stats.py            # Session aggregation for the Arena stats page
+│       │   ├── exploit_profiles.py # Module 7: difficulty tiers, jitter, answer keys
+│       │   ├── exploit_stats.py    # Module 7: HUD, spot classification, execution scoring
+│       │   ├── exploit_views.py    # Module 7: match lifecycle endpoints
+│       │   ├── models.py           # HandHistory (§6), LiveHand, ExploitMatch
 │       │   └── tests/
-│       │       ├── test_hand_eval.py
-│       │       ├── test_game_loop.py
-│       │       └── test_ev_eval.py
-│       └── llm_tutor/               # Generative explanations + rule-based adversarial bot
-│           ├── prompts.py           # Prompt templates; numeric ground truth injected, never computed by the LLM
-│           ├── client.py            # Anthropic API service layer: retries, timeouts, caching, rate limiting
-│           └── tests/
+│       ├── admin_analytics/        # Module 8: instructor/researcher API (read-only, staff-gated)
+│       │   ├── permissions.py      # IsStaffUser / IsStaffReadOnly
+│       │   ├── aggregates.py       # Cohort rollups — constant query count by design
+│       │   ├── item_analysis.py    # p-value + discrimination over the observation log
+│       │   ├── views.py
+│       │   └── tests/
+│       └── llm_tutor/              # Generative explanations (Module 5 — STUBBED)
+│           ├── prompts.py          # Prompt templates; ground truth injected, never computed by the LLM
+│           └── client.py           # Anthropic API service layer: retries, timeouts, caching, rate limiting
 │
 └── frontend/
     ├── package.json
@@ -91,13 +111,23 @@ poker-its/
     ├── .env.example                # API base URL, CORS-related config
     └── src/
         ├── components/
-        │   ├── PokerTable/          # Cards, pot, stacks, action buttons
-        │   ├── QuizModal/           # Inline diagnostic question overlay
-        │   └── Analytics/           # Progress dashboards (Recharts/Chart.js)
-        ├── hooks/
-        │   └── useGameState.js      # Frontend poker action + quiz-sync state management
+        │   ├── PokerTable.jsx      # Cards, pot, stacks
+        │   ├── ActionBar.jsx       # Fold/call/raise — shared by Arena and Exploit Lab
+        │   ├── QuizModal.jsx       # Inline diagnostic question overlay
+        │   ├── HandReplayModal.jsx # Animated lead-up to the decision point
+        │   ├── analytics/          # Progress dashboards (Recharts)
+        │   ├── learn/              # Module 6: lesson layout, prose primitives, widgets/
+        │   ├── exploit/            # Module 7: HudPanel, DiagnosisModal, MatchReveal
+        │   └── admin/              # Module 8: console layout + primitives
+        ├── lessons/                # Module 6 curriculum
+        │   ├── meta.js             # Slugs, skills, prereqs, anchors — no lesson bodies
+        │   ├── registry.jsx        # slug → React.lazy body
+        │   ├── math.js             # Pure mirror of ev_eval.py / generators.py (anti-drift)
+        │   └── content/            # The eight lesson bodies
+        ├── pages/                  # One file per route; pages/admin/ for the console
         ├── services/
-        │   └── api.js               # Axios bindings to Django REST endpoints
+        │   └── api.js              # Axios bindings to Django REST endpoints
+        ├── constants.js            # Skill labels, mastery gates, chart palette
         ├── App.jsx
         └── main.jsx
 ```
@@ -115,23 +145,45 @@ Tracks current mastery estimate per skill:
   "equity_estimation": 0.41,
   "pot_odds": 0.78,
   "implied_odds": 0.35,
-  "mdf": 0.55
+  "mdf": 0.55,
+  "opponent_reading": 0.28
 }
 ```
+(`opponent_reading` was added by Module 7 — see §8.)
 
 **b) Append-only observation log (`SkillObservation`, relational table — build this in
 Module 1, not later)**
 ```
-user_id | skill | timestamp | correct (bool) | posterior_after | source ("quiz" | "hand")
+user_id | skill | timestamp | correct (bool) | posterior_after | source | reference_id
 ```
-This table is what powers Module 4's dashboards and is impossible to backfill accurately
-after the fact — create it from day one even though Module 1 only uses quizzes.
+`source` is one of `"quiz" | "infinite" | "hand" | "exploit"`; `reference_id` records the
+question, hand or match that produced the observation, which is what makes Module 8's item
+analysis possible at all. This table powers Module 4's dashboards and is impossible to
+backfill accurately after the fact — create it from day one even though Module 1 only uses
+quizzes.
 
-**BKT parameters:** For each of the 5 skills, define explicit starting values for
-P(L0) [prior knowledge], P(T) [transition/learning rate], P(guess), and P(slip). Hardcode
-reasonable defaults for Milestone 1 (document them in a comment block in `bkt_engine.py`)
-rather than leaving them unspecified. Do not treat these as an implementation detail to
-figure out later — the whole system's correctness depends on them.
+**BKT parameters:** For each skill, define explicit starting values for P(L0) [prior
+knowledge], P(T) [transition/learning rate], P(guess), and P(slip). Hardcode reasonable
+defaults for Milestone 1 (document them in a comment block in `bkt_engine.py`) rather than
+leaving them unspecified. Do not treat these as an implementation detail to figure out
+later — the whole system's correctness depends on them.
+
+**Parameter retune (post-Module 4, applied).** The initial uniform placeholders
+(`P(G)=0.25`, `P(T)=0.10` for every skill) let three correct answers in a row master a
+skill. Two corrections:
+
+- **P(guess) is item-format-specific.** It is the chance a *non-master* answers correctly,
+  and for binary, live-graded skills that is high — a naive "always continue" player
+  matches the heads-up button's opening chart ~82% of the time. So near-binary skills
+  (`preflop_range`, `pot_odds`, `mdf`) get `P(G) ≈ 0.40–0.45`, while genuine four-option
+  quiz items (`equity_estimation`, `implied_odds`, `opponent_reading`) keep `P(G) ≈ 0.25–0.30`.
+- **P(T) drops to ~0.05–0.06** so mastery reflects evidence rather than baked-in optimism.
+
+Additionally, a posterior alone is not sufficient evidence: mastery also requires
+`MASTERY_MIN_OBSERVATIONS = 5` observations for the skill, so a lucky short streak cannot
+master anything. Both the server and the client enforce this, and the frontend renders a
+skill with zero observations as "Not started" rather than quoting its untouched prior as
+progress.
 
 **Binary-observation mapping for live play (Module 3):** BKT consumes binary
 correct/incorrect observations. Live-hand EV loss is continuous. Define an explicit,
@@ -241,12 +293,78 @@ adds the human-authored curriculum layer of the ITS.
   lesson link. Sections carry stable anchor ids (`/learn/<slug>#<section>`) so the
   Module 5 Explaining Coach can deep-link lesson material later.
 
+### Module 7 — Exploit Lab (exploitative play)
+
+Rationale: Modules 1–4 teach and grade play against a *benchmark* — charts, pot odds, MDF.
+That is half of poker. The other half is adjusting to a specific opponent, and no amount of
+GTO drilling teaches it. Module 7 makes the full exploitative loop — *observe → hypothesize
+→ adjust → verify* — into first-class graded artifacts.
+
+- `/exploit`: heads-up matches against a **mystery bot** whose leak is hidden and whose
+  parameters are jittered per match, so archetypes can't be memorized. Three phases:
+  **Scout** (play, accumulate HUD evidence) → **Diagnosis** (commit to a read and a
+  counter, both graded) → **Exploit** (demonstrate the adjustment) → full reveal.
+- Reuses the Module 3 stack wholesale (`HeadsUpHand`, `LiveHand`, `PokerTable`, the
+  existing action endpoint). No multiway engine work; difficulty scales via leak magnitude,
+  HUD visibility, and hand budget.
+- **GTO grading is off inside matches** (`grading='exploit'`). This is not an optimization —
+  the existing grader would record BKT observations punishing exactly the deviations the
+  mode teaches (calling below MDF against a maniac is *correct* here).
+- Scoring is **variance-free**: diagnosis accuracy plus exploit-execution frequency within
+  classified spot classes. Chips won are displayed with the usual variance framing (§1) and
+  never graded.
+- Adds one BKT skill, `opponent_reading`, fed by the diagnosis checkpoint and the execution
+  score. Fewer than three qualifying spots records no observation at all — a card-dead run
+  is not evidence of a bad read.
+- **Leakage discipline** mirrors the replay endpoint's answer-key rule: no response before
+  the match completes may reveal the bot's archetype or parameters.
+- Match hands are excluded from Arena aggregates (`match__isnull=True`), or bb/100 and the
+  per-profile split silently corrupt.
+
+Full work order: `EXPLOIT_LAB_PLAN.md`.
+
+### Module 8 — Instructor & Research Console
+
+Rationale: the observation log is a research artifact, and an ITS that can't tell an
+instructor *which questions are broken* will keep grading students against a miskeyed
+answer forever. This module is the read side of everything the other modules write.
+
+- `/admin/*` in the SPA, `/api/admin/` on the server. Access is Django's existing
+  `User.is_staff` — one user table, one login, one JWT; the console is a different *view*
+  of the same identity, not a parallel account model. `manage.py promote_staff` grants it
+  without an interactive shell (accounts still sign up normally, so no password ever lives
+  in an environment variable).
+- **Read-only by default** (`IsStaffReadOnly`). The console analyses the student model; it
+  must never edit it, so a stray write can't corrupt the data the ITS reasons about.
+  Authorization is re-decided server-side on every request — the SPA route guard is a UI
+  convenience, since the JWT is client-side and the endpoints are directly reachable.
+- Surfaces: cohort overview (mastery **distributions**, not means — a bimodal class and an
+  average class have identical means), student roster with computed columns, per-student
+  drill-down, **classical item analysis**, learning curves, data-health checks, and
+  streaming CSV export.
+- **Item analysis is the point.** p-value (fraction correct) plus discrimination (the
+  correlation between per-item score and the student's accuracy on all *other*
+  observations). Negative discrimination is the signature of a miskeyed answer — students
+  who understand the material being systematically marked wrong — and nothing else in the
+  system catches it. Generated items group by generator family, since per-seed rows would
+  all be n=1.
+- Aggregation issues a **constant number of queries** regardless of cohort size. The two
+  tempting shapes both fail: a per-user loop is an N+1, and a single multi-join
+  `annotate()` multiplies counts through the join.
+
+> **Numbering note:** the Exploit Lab was built and labeled "Module 5" in several code
+> comments before this document was reconciled. Module 5 here means the LLM tutor, which
+> is still unbuilt. The docs use Module 7 = Exploit Lab, Module 8 = instructor console.
+
 ## 9. Engineering Scaffolding Checklist (must exist before Module 1 is considered done)
 
-- [ ] `requirements.txt` / `pyproject.toml`
-- [ ] `.env.example` for both backend (LLM API key, DB creds) and frontend (API base URL)
-- [ ] CORS configuration between Vite and Django
-- [ ] DRF serializers + chosen auth mechanism
-- [ ] `tests/` directories under every app, with `bkt_engine.py`, `hand_eval.py`, and
+All items complete.
+
+- [x] `requirements.txt` / `pyproject.toml`
+- [x] `.env.example` for both backend (LLM API key, DB creds) and frontend (API base URL)
+- [x] CORS configuration between Vite and Django
+- [x] DRF serializers + chosen auth mechanism — JWT (SimpleJWT) with refresh rotation
+- [x] `tests/` directories under every app, with `bkt_engine.py`, `hand_eval.py`, and
       `ev_eval.py` covered before their consuming modules are built
-- [ ] Seeded RNG for the deck, used consistently in tests and scenario generation
+      *(exception: `llm_tutor` has no tests — it is still a stub with nothing to test)*
+- [x] Seeded RNG for the deck, used consistently in tests and scenario generation
